@@ -6,13 +6,29 @@ import json
 
 webhook_bp = Blueprint('webhook', __name__)
 
-@webhook_bp.route('/', methods=['POST'], strict_slashes=False)
-@webhook_bp.route('', methods=['POST'], strict_slashes=False)
+@webhook_bp.route('/test', methods=['GET', 'POST'], strict_slashes=False)
+def webhook_test():
+    """Simple test endpoint to verify webhook is reachable"""
+    return jsonify({
+        'status': 'OK',
+        'message': 'Webhook endpoint is working',
+        'method': request.method,
+        'timestamp': datetime.now().isoformat()
+    }), 200
+
+@webhook_bp.route('/', methods=['POST', 'GET'], strict_slashes=False)
+@webhook_bp.route('', methods=['POST', 'GET'], strict_slashes=False)
 def tradingview_webhook():
     """
     TradingView webhook endpoint - accepts any JSON payload
     Logs all incoming webhooks to database
     """
+    # Log everything for debugging
+    print(f"🔔 WEBHOOK RECEIVED - Method: {request.method}")
+    print(f"📋 Headers: {dict(request.headers)}")
+    print(f"📦 Raw Data: {request.data}")
+    print(f"🔍 Content-Type: {request.content_type}")
+    
     # Accept both JSON and form data
     if request.is_json:
         data = request.get_json()
@@ -21,10 +37,14 @@ def tradingview_webhook():
         try:
             data = json.loads(request.data.decode('utf-8'))
         except:
-            data = {'raw_message': request.data.decode('utf-8')}
+            data = {
+                'raw_message': request.data.decode('utf-8'),
+                'content_type': request.content_type,
+                'method': request.method
+            }
     
     if not data:
-        return jsonify({'error': 'No data provided'}), 400
+        data = {'empty': True, 'method': request.method}
     
     # Save webhook to database
     try:
