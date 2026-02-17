@@ -12,10 +12,10 @@ from config import Config
 
 def run_migration():
     """Add demo_mode column to bot_config if it doesn't exist"""
-    conn = sqlite3.connect(Config.DATABASE_PATH)
-    cursor = conn.cursor()
-    
     try:
+        conn = sqlite3.connect(Config.DATABASE_PATH)
+        cursor = conn.cursor()
+        
         # Check if column already exists
         cursor.execute("PRAGMA table_info(bot_config)")
         columns = [col[1] for col in cursor.fetchall()]
@@ -31,11 +31,15 @@ def run_migration():
         else:
             print("ℹ️ Column demo_mode already exists, skipping migration")
         
-    except Exception as e:
-        print(f"❌ Migration failed: {str(e)}")
-        conn.rollback()
-    finally:
         conn.close()
+        
+    except sqlite3.OperationalError as e:
+        if "duplicate column" in str(e).lower():
+            print("ℹ️ Column demo_mode already exists (caught duplicate error)")
+        else:
+            print(f"⚠️ Migration error (non-critical): {str(e)}")
+    except Exception as e:
+        print(f"⚠️ Migration error (non-critical): {str(e)}")
 
 if __name__ == '__main__':
     run_migration()

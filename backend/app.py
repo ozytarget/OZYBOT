@@ -22,6 +22,8 @@ with app.app_context():
     try:
         from migrations.add_demo_mode import run_migration
         run_migration()
+        from migrations.repair_database import repair_database
+        repair_database()
     except Exception as e:
         print(f"⚠️ Migration warning: {str(e)}")
 

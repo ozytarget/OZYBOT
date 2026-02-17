@@ -16,17 +16,32 @@ def get_config(user_id):
     ''', (user_id,))
     
     config = cursor.fetchone()
-    conn.close()
     
     if not config:
-        return jsonify({'error': 'Config not found'}), 404
+        # Create bot config if missing
+        cursor.execute('INSERT INTO bot_config (user_id, is_active, demo_mode) VALUES (?, ?, ?)',
+                       (user_id, 0, 1))
+        conn.commit()
+        cursor.execute('''
+            SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent, demo_mode
+            FROM bot_config WHERE user_id = ?
+        ''', (user_id,))
+        config = cursor.fetchone()
+    
+    conn.close()
+    
+    # Handle demo_mode field safely
+    try:
+        demo_mode = bool(config['demo_mode'])
+    except (KeyError, TypeError):
+        demo_mode = True
     
     return jsonify({
         'risk_level': config['risk_level'],
         'max_position_size': config['max_position_size'],
         'stop_loss_percent': config['stop_loss_percent'],
         'take_profit_percent': config['take_profit_percent'],
-        'demo_mode': bool(config['demo_mode'])
+        'demo_mode': demo_mode
     }), 200
 
 @settings_bp.route('/config', methods=['PUT'])

@@ -10,16 +10,33 @@ def get_stats(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Get trading stats
+    # Get trading stats - create if missing
     cursor.execute('''
         SELECT total_trades, winning_trades, losing_trades, total_profit
         FROM trading_stats WHERE user_id = ?
     ''', (user_id,))
     stats = cursor.fetchone()
     
-    # Get bot status
+    if not stats:
+        # Create trading stats if missing
+        cursor.execute('INSERT INTO trading_stats (user_id) VALUES (?)', (user_id,))
+        conn.commit()
+        cursor.execute('''
+            SELECT total_trades, winning_trades, losing_trades, total_profit
+            FROM trading_stats WHERE user_id = ?
+        ''', (user_id,))
+        stats = cursor.fetchone()
+    
+    # Get bot status - create if missing
     cursor.execute('SELECT is_active, demo_mode FROM bot_config WHERE user_id = ?', (user_id,))
     bot_config = cursor.fetchone()
+    
+    if not bot_config:
+        # Create bot config if missing
+        cursor.execute('INSERT INTO bot_config (user_id, is_active, demo_mode) VALUES (?, ?, ?)',
+                       (user_id, 0, 1))
+        conn.commit()
+        bot_config = {'is_active': 0, 'demo_mode': 1}
     
     # Get open positions count
     cursor.execute('''
@@ -30,12 +47,16 @@ def get_stats(user_id):
     
     conn.close()
     
-    if not stats:
-        return jsonify({'error': 'Stats not found'}), 404
-    
     win_rate = 0
     if stats['total_trades'] > 0:
         win_rate = (stats['winning_trades'] / stats['total_trades']) * 100
+    
+    # Handle demo_mode field - might not exist in old databases
+    demo_mode = bot_config.get('demo_mode', 1) if isinstance(bot_config, dict) else 1
+    try:
+        demo_mode = bool(bot_config['demo_mode'])
+    except (KeyError, TypeError):
+        demo_mode = True
     
     return jsonify({
         'total_trades': stats['total_trades'],
@@ -44,7 +65,7 @@ def get_stats(user_id):
         'win_rate': round(win_rate, 2),
         'total_profit': stats['total_profit'],
         'bot_active': bool(bot_config['is_active']),
-        'demo_mode': bool(bot_config['demo_mode']),
+        'demo_mode': demo_mode,
         'open_positions': positions_data['open_count']
     }), 200
 
@@ -93,8 +114,28 @@ def toggle_bot(user_id):
     config = cursor.fetchone()
     
     if not config:
+        # Create bot config if it doesn't exist
+        print(f"Creating bot config for user {user_id}")
+        cursor.execute('INSERT INTO bot_config (user_id, is_active, demo_mode) VALUES (?, ?, ?)',
+                       (user_id, 1, 1))  # Start active in demo mode
+        
+        # Also create trading stats if missing
+        cursor.execute('SELECT id FROM trading_stats WHERE user_id = ?', (user_id,))
+        if not cursor.fetchone():
+            cursor.execute('INSERT INTO trading_stats (user_id) VALUES (?)', (user_id,))
+        
+        # Also create broker settings if missing
+        cursor.execute('SELECT id FROM broker_settings WHERE user_id = ?', (user_id,))
+        if not cursor.fetchone():
+            cursor.execute('INSERT INTO broker_settings (user_id) VALUES (?)', (user_id,))
+        
+        conn.commit()
         conn.close()
-        return jsonify({'error': 'Bot config not found'}), 404
+        
+        return jsonify({
+            'message': 'Bot config created and activated',
+            'is_active': True
+        }), 200
     
     # Toggle status
     new_status = not config['is_active']
