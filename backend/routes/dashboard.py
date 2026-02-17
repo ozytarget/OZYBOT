@@ -107,3 +107,31 @@ def toggle_bot(user_id):
         'message': 'Bot status updated',
         'is_active': new_status
     }), 200
+
+@dashboard_bp.route('/webhooks', methods=['GET'])
+@token_required
+def get_webhooks(user_id):
+    """Get recent webhooks received from TradingView"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get last 50 webhooks
+    cursor.execute('''
+        SELECT id, payload, received_at
+        FROM webhooks 
+        ORDER BY received_at DESC
+        LIMIT 50
+    ''')
+    
+    webhooks = cursor.fetchall()
+    conn.close()
+    
+    webhooks_list = []
+    for webhook in webhooks:
+        webhooks_list.append({
+            'id': webhook['id'],
+            'payload': webhook['payload'],
+            'received_at': webhook['received_at']
+        })
+    
+    return jsonify({'webhooks': webhooks_list}), 200

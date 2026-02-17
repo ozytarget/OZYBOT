@@ -78,5 +78,14 @@ def init_db():
         )
     ''')
     
+    # Webhooks table - log all incoming webhooks
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS webhooks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            payload TEXT NOT NULL,
+            received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
     conn.commit()
     conn.close()
