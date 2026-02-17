@@ -16,6 +16,48 @@ def webhook_test():
         'timestamp': datetime.now().isoformat()
     }), 200
 
+@webhook_bp.route('/recent', methods=['GET'], strict_slashes=False)
+def recent_webhooks():
+    """Get recent webhooks - PUBLIC endpoint for debugging"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, payload, received_at
+            FROM webhooks 
+            ORDER BY received_at DESC
+            LIMIT 20
+        ''')
+        
+        webhooks = cursor.fetchall()
+        conn.close()
+        
+        webhooks_list = []
+        for webhook in webhooks:
+            try:
+                payload_data = json.loads(webhook['payload'])
+            except:
+                payload_data = webhook['payload']
+            
+            webhooks_list.append({
+                'id': webhook['id'],
+                'payload': payload_data,
+                'received_at': webhook['received_at']
+            })
+        
+        return jsonify({
+            'count': len(webhooks_list),
+            'webhooks': webhooks_list
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'count': 0,
+            'webhooks': []
+        }), 200
+
 @webhook_bp.route('/', methods=['POST', 'GET'], strict_slashes=False)
 @webhook_bp.route('', methods=['POST', 'GET'], strict_slashes=False)
 def tradingview_webhook():
