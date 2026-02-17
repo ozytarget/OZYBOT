@@ -5,15 +5,16 @@
 ### Paso 1: Instalar ngrok
 
 1. **Descargar ngrok:**
-   - Ve a: https://ngrok.com/download
+   - Ve a: <https://ngrok.com/download>
    - Descarga la versión para Windows
    - Descomprime el archivo en `C:\ngrok`
 
 2. **Crear cuenta gratuita:**
-   - Registrate en: https://dashboard.ngrok.com/signup
+   - Registrate en: <https://dashboard.ngrok.com/signup>
    - Copia tu token de autenticación
 
 3. **Configurar ngrok:**
+
 ```powershell
 cd C:\ngrok
 .\ngrok.exe authtoken TU_TOKEN_AQUI
@@ -22,12 +23,14 @@ cd C:\ngrok
 ### Paso 2: Exponer el puerto 5000
 
 En una nueva terminal PowerShell:
+
 ```powershell
 cd C:\ngrok
 .\ngrok.exe http 5000
 ```
 
 Verás algo como:
+
 ```
 Forwarding    https://abc123.ngrok.io -> http://localhost:5000
 ```
@@ -38,7 +41,7 @@ Forwarding    https://abc123.ngrok.io -> http://localhost:5000
 
 ## 📡 PASO 3: CONFIGURAR ALERTA EN TRADINGVIEW
 
-### En TradingView:
+### En TradingView
 
 1. **Abre tu gráfico** con el indicador configurado
 
@@ -49,14 +52,17 @@ Forwarding    https://abc123.ngrok.io -> http://localhost:5000
    **Condition:** Tu indicador → Condición que quieras (ej: "Buy Signal", "Sell Signal")
 
 4. **En "Webhook URL":**
+
 ```
 https://tu-url-ngrok.ngrok.io/webhook
 ```
+
    (Reemplaza con tu URL de ngrok)
 
-5. **En "Message" (JSON):**
+1. **En "Message" (JSON):**
 
 **Para señal de COMPRA:**
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -67,6 +73,7 @@ https://tu-url-ngrok.ngrok.io/webhook
 ```
 
 **Para señal de VENTA:**
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -76,18 +83,18 @@ https://tu-url-ngrok.ngrok.io/webhook
 }
 ```
 
-6. **Configuración adicional:**
+1. **Configuración adicional:**
    - Nombre: "Bot Trading Alert"
    - Condition: Once per bar close (o según tu estrategia)
    - Expiration: No expira
 
-7. **Haz clic en "Create"**
+2. **Haz clic en "Create"**
 
 ---
 
 ## ✅ VERIFICAR QUE FUNCIONA
 
-### Prueba manual:
+### Prueba manual
 
 En PowerShell, prueba enviar una alerta de prueba:
 
@@ -103,6 +110,7 @@ Invoke-RestMethod -Uri "https://tu-url-ngrok.ngrok.io/webhook" -Method Post -Bod
 ```
 
 Si funciona, verás:
+
 ```json
 {
   "status": "received",
@@ -126,6 +134,7 @@ Si funciona, verás:
 ## 📊 MONITOREAR ALERTAS
 
 En tu terminal del backend verás:
+
 ```
 Webhook received: {'symbol': 'BTCUSD', 'action': 'buy', ...}
 ```
@@ -156,6 +165,7 @@ if data.get('secret') != WEBHOOK_SECRET:
 ```
 
 Y en TradingView, en el JSON del mensaje:
+
 ```json
 {
   "secret": "tu-secreto-seguro-123",

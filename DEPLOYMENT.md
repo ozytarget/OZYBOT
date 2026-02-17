@@ -2,7 +2,7 @@
 
 ## ✅ PASO 1: SUBIR A GITHUB (COMPLETADO)
 
-Tu repositorio: https://github.com/ozytarget/OZYBOT
+Tu repositorio: <https://github.com/ozytarget/OZYBOT>
 
 ---
 
@@ -38,7 +38,7 @@ Si te pide credenciales, usa tu Personal Access Token de GitHub.
 
 ### 3.1 Crear cuenta en Railway
 
-1. Ve a: **https://railway.app**
+1. Ve a: **<https://railway.app>**
 2. Haz clic en **"Start a New Project"**
 3. Conecta con tu cuenta de GitHub
 4. Da permisos a Railway para acceder a tus repositorios
@@ -82,16 +82,19 @@ Actualiza la URL del backend en el frontend:
 **Archivo:** `frontend/src/api.js`
 
 Cambia:
+
 ```javascript
 const API_BASE_URL = 'http://localhost:5000';
 ```
 
 Por:
+
 ```javascript
 const API_BASE_URL = 'https://tu-url-railway.up.railway.app';
 ```
 
 Luego sube el cambio:
+
 ```powershell
 git add .
 git commit -m "Update API URL for production"
@@ -105,15 +108,18 @@ Railway lo redesplegarajá automáticamente.
 ## 📡 PASO 5: CONFIGURAR TRADINGVIEW
 
 Tu webhook URL será:
+
 ```
 https://tu-url-railway.up.railway.app/webhook
 ```
 
 En TradingView:
+
 1. Crea tu alerta
 2. Activa Webhook URL
 3. Pon: `https://tu-url-railway.up.railway.app/webhook`
 4. Message (JSON):
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -171,6 +177,7 @@ Después del deploy:
 ## 📊 MONITOREO
 
 En Railway puedes ver:
+
 - **Logs:** En tiempo real
 - **Métricas:** CPU, RAM, Network
 - **Deployments:** Historial de deployments
@@ -181,11 +188,13 @@ En Railway puedes ver:
 ## 🚨 TROUBLESHOOTING
 
 **Si el deploy falla:**
+
 1. Revisa los logs en Railway
 2. Verifica que `requirements.txt` esté correcto
 3. Asegúrate que `PORT` esté en las variables de entorno
 
 **Si la base de datos se borra:**
+
 - Railway usa almacenamiento efímero en el plan gratuito
 - Para persistencia, considera Railway Postgres (plan de pago)
 - O usa Railway Volumes

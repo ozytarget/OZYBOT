@@ -17,6 +17,7 @@ En el archivo `frontend/src/api.js`, actualiza la línea 3:
 ```
 
 Guarda el cambio y haz commit:
+
 ```powershell
 cd c:\Users\urbin\copilot-bot
 git add .
@@ -28,7 +29,7 @@ git push
 
 ### 2. Ir a Vercel
 
-1. **Ve a:** https://vercel.com
+1. **Ve a:** <https://vercel.com>
 2. **Sign Up / Login** con tu cuenta de GitHub
 3. Autoriza a Vercel
 
@@ -89,6 +90,7 @@ Tendrás:
 ## 📡 WEBHOOK PARA TRADINGVIEW
 
 Tu webhook URL es la de Railway (backend):
+
 ```
 https://tu-url-railway.up.railway.app/webhook
 ```
@@ -107,10 +109,12 @@ Cada vez que hagas cambios:
 ## 🆘 SI ALGO FALLA
 
 **Si el frontend no conecta con el backend:**
+
 1. Verifica que actualizaste la URL en `frontend/src/api.js`
 2. Asegúrate que el backend tenga CORS habilitado (ya lo tiene)
 3. Revisa los logs en Vercel
 
 **Si Vercel no encuentra los archivos:**
+
 1. Asegúrate de poner `frontend` como Root Directory
 2. Verifica que el Build Command sea `npm run build`

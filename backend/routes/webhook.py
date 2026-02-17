@@ -5,7 +5,8 @@ from datetime import datetime
 
 webhook_bp = Blueprint('webhook', __name__)
 
-@webhook_bp.route('/', methods=['POST'])
+@webhook_bp.route('/', methods=['POST'], strict_slashes=False)
+@webhook_bp.route('', methods=['POST'], strict_slashes=False)
 def tradingview_webhook():
     """
     TradingView webhook endpoint

@@ -6,7 +6,7 @@ Trading bot automatizado con Python Flask backend y React frontend. Recibe seña
 
 - **Backend API:** Desplegado en Railway
 - **Frontend Web:** Despliega en Vercel (ver instrucciones abajo)
-- **GitHub:** https://github.com/ozytarget/OZYBOT
+- **GitHub:** <https://github.com/ozytarget/OZYBOT>
 
 ## Features
 
@@ -20,6 +20,7 @@ Trading bot automatizado con Python Flask backend y React frontend. Recibe seña
 ## Tech Stack
 
 ### Backend
+
 - Python 3.x
 - Flask - Web framework
 - SQLite - Database
@@ -27,6 +28,7 @@ Trading bot automatizado con Python Flask backend y React frontend. Recibe seña
 - bcrypt - Password hashing
 
 ### Frontend
+
 - React 18
 - Vite - Build tool
 - React Router - Navigation
@@ -67,31 +69,36 @@ copilot-bot/
 ### Backend Setup
 
 1. Navigate to backend directory:
+
 ```bash
 cd backend
 ```
 
-2. Create a virtual environment (optional but recommended):
+1. Create a virtual environment (optional but recommended):
+
 ```bash
 python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Mac/Linux
 ```
 
-3. Install dependencies:
+1. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Create `.env` file from template:
+1. Create `.env` file from template:
+
 ```bash
 copy .env.example .env  # Windows
 # cp .env.example .env  # Mac/Linux
 ```
 
-5. Update `.env` with your settings (optional for development)
+1. Update `.env` with your settings (optional for development)
 
-6. Run the backend:
+2. Run the backend:
+
 ```bash
 python app.py
 ```
@@ -101,16 +108,19 @@ Backend will run on `http://localhost:5000`
 ### Frontend Setup
 
 1. Navigate to frontend directory:
+
 ```bash
 cd frontend
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Run the development server:
+1. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -120,22 +130,26 @@ Frontend will run on `http://localhost:3000`
 ## API Endpoints
 
 ### Authentication
+
 - `POST /auth/register` - Register new user
 - `POST /auth/login` - Login user
 - `GET /auth/me` - Get current user info
 
 ### Dashboard
+
 - `GET /dashboard/stats` - Get trading statistics
 - `GET /dashboard/positions` - Get all positions
 - `POST /dashboard/toggle-bot` - Start/stop bot
 
 ### Settings
+
 - `GET /settings/config` - Get bot configuration
 - `PUT /settings/config` - Update bot configuration
 - `GET /settings/broker` - Get broker settings
 - `PUT /settings/broker` - Update broker settings
 
 ### Webhook
+
 - `POST /webhook` - Receive TradingView webhooks
 
 ## Usage

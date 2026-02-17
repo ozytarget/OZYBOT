@@ -12,9 +12,9 @@ Write-Host ""
 
 # Test data - Buy signal
 $buySignal = @{
-    symbol = "BTCUSD"
-    action = "buy"
-    price = 50000.50
+    symbol   = "BTCUSD"
+    action   = "buy"
+    price    = 50000.50
     quantity = 0.1
 } | ConvertTo-Json
 
@@ -26,7 +26,8 @@ try {
     $response = Invoke-RestMethod -Uri $url -Method Post -Body $buySignal -ContentType "application/json"
     Write-Host "✅ RESPUESTA:" -ForegroundColor Green
     Write-Host ($response | ConvertTo-Json) -ForegroundColor White
-} catch {
+}
+catch {
     Write-Host "❌ ERROR:" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
     Write-Host ""

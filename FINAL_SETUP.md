@@ -2,15 +2,16 @@
 
 ## ✅ BACKEND DESPLEGADO
 
-**URL Backend:** https://botz.up.railway.app/
+**URL Backend:** <https://botz.up.railway.app/>
 
 **Endpoints disponibles:**
-- Health: https://botz.up.railway.app/health
-- API Info: https://botz.up.railway.app/
-- Auth: https://botz.up.railway.app/auth/...
-- Dashboard: https://botz.up.railway.app/dashboard/...
-- Settings: https://botz.up.railway.app/settings/...
-- Webhook: https://botz.up.railway.app/webhook
+
+- Health: <https://botz.up.railway.app/health>
+- API Info: <https://botz.up.railway.app/>
+- Auth: <https://botz.up.railway.app/auth/>...
+- Dashboard: <https://botz.up.railway.app/dashboard/>...
+- Settings: <https://botz.up.railway.app/settings/>...
+- Webhook: <https://botz.up.railway.app/webhook>
 
 ---
 
@@ -18,7 +19,7 @@
 
 ### PASO 1: Ve a Vercel
 
-👉 **https://vercel.com**
+👉 **<https://vercel.com>**
 
 ### PASO 2: Login con GitHub
 
@@ -45,6 +46,7 @@ Install Command: npm install
 ```
 
 **Captura de ejemplo:**
+
 ```
 ┌──────────────────────────────────────┐
 │ Configure Project                    │
@@ -78,10 +80,13 @@ Value: https://botz.up.railway.app
 ### PASO 7: Obtener tu URL
 
 Vercel te dará una URL como:
+
 ```
 https://ozybot.vercel.app
 ```
+
 o
+
 ```
 https://ozybot-ozytarget.vercel.app
 ```
@@ -91,18 +96,23 @@ https://ozybot-ozytarget.vercel.app
 ## ✅ VERIFICAR QUE TODO FUNCIONA
 
 ### 1. Backend (Railway)
+
 ```
 https://botz.up.railway.app/health
 ```
+
 Deberías ver: `{"status":"healthy"}`
 
 ### 2. Frontend (Vercel)
+
 Abre tu URL de Vercel en el navegador:
+
 ```
 https://tu-app.vercel.app
 ```
 
 Deberías ver:
+
 - ✅ Pantalla de Login/Register
 - ✅ Formulario funcional
 - ✅ Sin errores en consola
@@ -112,6 +122,7 @@ Deberías ver:
 ## 🎯 USAR LA APLICACIÓN
 
 ### 1. Registrarte
+
 1. Abre tu URL de Vercel
 2. Haz clic en **"Register"**
 3. Ingresa:
@@ -120,6 +131,7 @@ Deberías ver:
 4. Haz clic en **"Register"**
 
 ### 2. Configurar el Bot
+
 1. Ve a **"Settings"** (menú superior)
 2. Configura:
    - Risk Level: **Medium**
@@ -129,11 +141,13 @@ Deberías ver:
 3. Haz clic en **"Save Configuration"**
 
 ### 3. Configurar Broker (Opcional)
+
 1. En Settings, sección "Broker Settings"
 2. Ingresa tu broker y API keys
 3. **"Save Broker Settings"**
 
 ### 4. Activar el Bot
+
 1. Ve a **"Dashboard"**
 2. Haz clic en **"Start Bot"** (botón verde)
 3. El bot estará activo ✅
@@ -144,12 +158,13 @@ Deberías ver:
 
 Ahora puedes conectar tu indicador:
 
-### URL del Webhook:
+### URL del Webhook
+
 ```
 https://botz.up.railway.app/webhook
 ```
 
-### Configurar Alerta:
+### Configurar Alerta
 
 1. **En TradingView:**
    - Abre tu gráfico con el indicador
@@ -162,6 +177,7 @@ https://botz.up.railway.app/webhook
 3. **Message (JSON):**
 
 **Para COMPRA:**
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -172,6 +188,7 @@ https://botz.up.railway.app/webhook
 ```
 
 **Para VENTA:**
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -181,7 +198,7 @@ https://botz.up.railway.app/webhook
 }
 ```
 
-4. **Create Alert**
+1. **Create Alert**
 
 ---
 
@@ -191,9 +208,9 @@ Tu sistema completo:
 
 | Componente | URL | Estado |
 |------------|-----|--------|
-| **Backend API** | https://botz.up.railway.app | ✅ Online |
-| **Frontend Web** | https://tu-app.vercel.app | 🔄 Por desplegar |
-| **GitHub** | https://github.com/ozytarget/OZYBOT | ✅ Actualizado |
+| **Backend API** | <https://botz.up.railway.app> | ✅ Online |
+| **Frontend Web** | <https://tu-app.vercel.app> | 🔄 Por desplegar |
+| **GitHub** | <https://github.com/ozytarget/OZYBOT> | ✅ Actualizado |
 
 ---
 
@@ -202,6 +219,7 @@ Tu sistema completo:
 Puedes probar el webhook manualmente:
 
 **En PowerShell:**
+
 ```powershell
 $body = @{
     symbol = "BTCUSD"
@@ -214,6 +232,7 @@ Invoke-RestMethod -Uri "https://botz.up.railway.app/webhook" -Method Post -Body 
 ```
 
 Deberías ver:
+
 ```json
 {
   "status": "received",
@@ -243,6 +262,7 @@ Tu bot ya tiene:
 ✅ HTTPS en ambos servicios
 
 **Recomendaciones adicionales:**
+
 - Cambia el `SECRET_KEY` en Railway (ya lo hiciste)
 - Usa contraseñas fuertes
 - Agrega webhook secret para TradingView
@@ -262,11 +282,13 @@ Tu bot ya tiene:
 ## 🆘 SOPORTE
 
 **Si algo falla en Vercel:**
+
 - Verifica que pusiste `frontend` como Root Directory
 - Asegúrate que el Framework sea Vite
 - Revisa los logs de build en Vercel
 
 **Si el frontend no conecta con el backend:**
+
 - Abre la consola del navegador (F12)
 - Verifica que las llamadas vayan a `https://botz.up.railway.app`
 - Revisa que CORS esté habilitado en Railway

@@ -8,7 +8,8 @@ Write-Host ""
 $ngrokPath = "C:\ngrok\ngrok.exe"
 if (Test-Path $ngrokPath) {
     Write-Host "✅ ngrok encontrado en $ngrokPath" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "❌ ngrok NO encontrado" -ForegroundColor Red
     Write-Host ""
     Write-Host "INSTALAR NGROK:" -ForegroundColor Yellow
@@ -50,6 +51,7 @@ if (Test-Path $ngrokPath) {
     Write-Host "5. En Message pon el JSON (ver TRADINGVIEW_SETUP.md)" -ForegroundColor White
     Write-Host ""
     
-} else {
+}
+else {
     Write-Host "❌ No se puede continuar sin ngrok" -ForegroundColor Red
 }

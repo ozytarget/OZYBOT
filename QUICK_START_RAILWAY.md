@@ -3,11 +3,13 @@
 ## ✅ COMPLETADO
 
 ### 1. Código en GitHub ✅
-- **Repositorio:** https://github.com/ozytarget/OZYBOT
+
+- **Repositorio:** <https://github.com/ozytarget/OZYBOT>
 - **Commits:** 2 commits subidos
 - **Archivos:** 37 archivos del proyecto
 
 ### 2. Optimizado para Railway ✅
+
 - ✅ Configuración con gunicorn
 - ✅ Variables de entorno
 - ✅ Procfile configurado
@@ -18,9 +20,9 @@
 
 ## 🎯 SIGUIENTE PASO: DESPLEGAR EN RAILWAY
 
-### 📋 Instrucciones Rápidas:
+### 📋 Instrucciones Rápidas
 
-1. **Ve a:** https://railway.app
+1. **Ve a:** <https://railway.app>
 
 2. **Login with GitHub**
 
@@ -29,6 +31,7 @@
 4. **Selecciona:** `ozytarget/OZYBOT`
 
 5. **Agrega Variables de Entorno:**
+
    ```
    SECRET_KEY=ozy-bot-secret-key-12345-change-this
    FLASK_ENV=production
@@ -41,11 +44,13 @@
 7. **Copia tu URL:** `https://ozybot-production-xxxx.up.railway.app`
 
 8. **Actualiza frontend/src/api.js** (línea 3):
+
    ```javascript
    : 'https://TU-URL-RAILWAY.up.railway.app';
    ```
 
 9. **Commit y push:**
+
    ```powershell
    git add .
    git commit -m "Update Railway URL"
@@ -57,11 +62,13 @@
 ## 📡 CONFIGURAR TRADINGVIEW
 
 Tu Webhook URL será:
+
 ```
 https://tu-url-railway.up.railway.app/webhook
 ```
 
 **Message en TradingView (JSON):**
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -76,16 +83,19 @@ https://tu-url-railway.up.railway.app/webhook
 ## ✅ VERIFICACIÓN
 
 **Health Check:**
+
 ```
 https://tu-url-railway.up.railway.app/health
 ```
 
 Deberías ver:
+
 ```json
 {"status": "healthy"}
 ```
 
 **API Info:**
+
 ```
 https://tu-url-railway.up.railway.app/
 ```
@@ -128,8 +138,8 @@ OZYBOT/
 
 ## 🔗 ENLACES IMPORTANTES
 
-- **GitHub:** https://github.com/ozytarget/OZYBOT
-- **Railway:** https://railway.app
+- **GitHub:** <https://github.com/ozytarget/OZYBOT>
+- **Railway:** <https://railway.app>
 - **Documentación:** Ver DEPLOYMENT.md
 
 ---
@@ -137,6 +147,7 @@ OZYBOT/
 ## 🆘 SOPORTE
 
 Si algo falla:
+
 1. Revisa los logs en Railway
 2. Verifica las variables de entorno
 3. Asegúrate que el puerto esté configurado
