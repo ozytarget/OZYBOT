@@ -1,4 +1,5 @@
 import os
+import atexit
 from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
@@ -7,6 +8,7 @@ from routes.auth import auth_bp
 from routes.dashboard import dashboard_bp
 from routes.settings import settings_bp
 from routes.webhook import webhook_bp
+from services.price_monitor import price_monitor
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -28,6 +30,17 @@ with app.app_context():
         repair_database()
     except Exception as e:
         print(f"⚠️ Migration warning: {str(e)}")
+
+# Start Price Monitor for real-time price updates
+print("🚀 Iniciando Price Monitor...")
+price_monitor.start()
+
+# Clean shutdown
+def cleanup():
+    print("🛑 Deteniendo Price Monitor...")
+    price_monitor.stop()
+
+atexit.register(cleanup)
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
