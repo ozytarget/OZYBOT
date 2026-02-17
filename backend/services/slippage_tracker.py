@@ -6,7 +6,7 @@ import sqlite3
 from datetime import datetime
 
 class SlippageTracker:
-    def __init__(self, db_path='trading_bot.db'):
+    def __init__(self, db_path='trading.db'):
         self.db_path = db_path
         self.max_acceptable_slippage = 0.001  # 0.1% por defecto
     

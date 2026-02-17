@@ -253,6 +253,15 @@ def process_demo_trade(webhook_data):
             
             # Create demo position
             cursor.execute('''
+                INSERT INTO positions (
+                    user_id, symbol, side, quantity, entry_price, 
+                    current_price, pnl, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                user_id, ticker, signal, quantity, price,
+                price, 0.0, 'open'
+            ))
+            
             position_id = cursor.lastrowid
             
             # ✅ RECORD SLIPPAGE (TradingView expected price vs actual execution)
@@ -262,21 +271,10 @@ def process_demo_trade(webhook_data):
                     position_id=position_id,
                     ticker=ticker,
                     expected_price=price,  # From TradingView
-                    actual_price=price,    # In DEMO, same. In LIVE, broker execution price
-                    quantity=quantity,
-                    side=signal
+                    actual_price=price     # In DEMO, same. In LIVE, broker execution price
                 )
             except Exception as e:
                 print(f"⚠️ Error recording slippage: {str(e)}")
-            
-                INSERT INTO positions (
-                    user_id, symbol, side, quantity, entry_price, 
-                    current_price, pnl, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                user_id, ticker, signal, quantity, price,
-                price, 0.0, 'open'
-            ))
             
             # Update stats
             cursor.execute('''
