@@ -17,18 +17,23 @@ export default function PriceTicker({ ticker, api, token }) {
                 if (response.success && response.prices[ticker]) {
                     const priceData = response.prices[ticker];
                     
-                    if (prevPrice !== null) {
-                        if (priceData.price > prevPrice) {
-                            setColor('green');
-                        } else if (priceData.price < prevPrice) {
-                            setColor('red');
-                        } else {
+                    // Calcular color basado en precio anterior
+                    setPrice(prevPriceValue => {
+                        if (prevPriceValue !== null && prevPriceValue !== priceData.price) {
+                            if (priceData.price > prevPriceValue) {
+                                setColor('green');
+                            } else if (priceData.price < prevPriceValue) {
+                                setColor('red');
+                            }
+                        } else if (prevPriceValue === null) {
                             setColor('gray');
                         }
-                    }
-                    
-                    setPrevPrice(priceData.price);
-                    setPrice(priceData.price);
+                        
+                        setPrevPrice(priceData.price);
+                        return priceData.price;
+                    });
+                } else {
+                    console.warn(`No price data for ticker: ${ticker}`);
                 }
             } catch (err) {
                 console.error('Error fetching real-time price:', err);
@@ -38,11 +43,11 @@ export default function PriceTicker({ ticker, api, token }) {
         // Fetch inmediato
         fetchPrice();
 
-        // Actualizar cada 1 segundo
-        const interval = setInterval(fetchPrice, 1000);
+        // Actualizar cada 2 segundos (más eficiente)
+        const interval = setInterval(fetchPrice, 2000);
 
         return () => clearInterval(interval);
-    }, [ticker, prevPrice]);
+    }, [ticker, api, token]);
 
     if (!price) {
         return <span className="price-ticker loading">--</span>;

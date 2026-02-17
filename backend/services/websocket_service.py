@@ -33,7 +33,7 @@ class RealTimePriceService:
             cursor = conn.cursor()
             
             cursor.execute("""
-                SELECT DISTINCT ticker FROM positions WHERE status = 'open'
+                SELECT DISTINCT symbol FROM positions WHERE status = 'open'
             """)
             
             tickers = [row[0] for row in cursor.fetchall()]
@@ -113,14 +113,14 @@ class RealTimePriceService:
                 UPDATE positions 
                 SET current_price = ?,
                     updated_at = ?
-                WHERE ticker = ? AND status = 'open'
+                WHERE symbol = ? AND status = 'open'
             """, (price, datetime.now().isoformat(), ticker))
             
             # Obtener posiciones afectadas para calcular PnL
             cursor.execute("""
                 SELECT id, entry_price, quantity, side, remaining_quantity
                 FROM positions 
-                WHERE ticker = ? AND status = 'open'
+                WHERE symbol = ? AND status = 'open'
             """, (ticker,))
             
             positions = cursor.fetchall()

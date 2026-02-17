@@ -120,7 +120,7 @@ class PriceMonitor:
             
             # Obtener todas las posiciones abiertas
             cursor.execute("""
-                SELECT id, ticker, side, quantity, entry_price 
+                SELECT id, symbol, side, quantity, entry_price 
                 FROM positions 
                 WHERE status = 'open'
             """)
@@ -134,13 +134,13 @@ class PriceMonitor:
             print(f"🔄 Actualizando {len(positions)} posiciones...")
             
             for position in positions:
-                pos_id, ticker, side, quantity, entry_price = position
+                pos_id, symbol, side, quantity, entry_price = position
                 
                 # Obtener precio actual
-                current_price = self.get_current_price(ticker)
+                current_price = self.get_current_price(symbol)
                 
                 if current_price is None:
-                    print(f"⚠️ No se pudo obtener precio para {ticker}")
+                    print(f"⚠️ No se pudo obtener precio para {symbol}")
                     continue
                 
                 # Calcular PnL
@@ -156,7 +156,7 @@ class PriceMonitor:
                     WHERE id = ?
                 """, (current_price, pnl, datetime.now().isoformat(), pos_id))
                 
-                print(f"✅ {ticker}: ${entry_price:.2f} -> ${current_price:.2f} | PnL: ${pnl:.2f}")
+                print(f"✅ {symbol}: ${entry_price:.2f} -> ${current_price:.2f} | PnL: ${pnl:.2f}")
             
             conn.commit()
             conn.close()
@@ -186,7 +186,7 @@ class PriceMonitor:
             
             # Obtener posiciones abiertas con PnL calculado
             cursor.execute("""
-                SELECT id, ticker, entry_price, current_price, pnl, quantity
+                SELECT id, symbol, entry_price, current_price, pnl, quantity
                 FROM positions 
                 WHERE status = 'open' AND current_price IS NOT NULL
             """)
@@ -194,7 +194,7 @@ class PriceMonitor:
             positions = cursor.fetchall()
             
             for position in positions:
-                pos_id, ticker, entry_price, current_price, pnl, quantity = position
+                pos_id, symbol, entry_price, current_price, pnl, quantity = position
                 
                 # Calcular porcentaje de ganancia/pérdida
                 pnl_percent = (pnl / (entry_price * quantity)) * 100
@@ -236,7 +236,7 @@ class PriceMonitor:
                             WHERE user_id = (SELECT user_id FROM positions WHERE id = ?)
                         """, (pnl, pos_id))
                     
-                    print(f"🔴 Posición cerrada automáticamente: {ticker} | {close_reason} | PnL: ${pnl:.2f}")
+                    print(f"🔴 Posición cerrada automáticamente: {symbol} | {close_reason} | PnL: ${pnl:.2f}")
             
             conn.commit()
             conn.close()

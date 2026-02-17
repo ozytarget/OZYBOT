@@ -328,11 +328,44 @@ def get_connection_status():
 
 @dashboard_bp.route('/realtime-prices', methods=['GET'])
 def get_realtime_prices():
-    """Obtiene los últimos precios con colores (verde/rojo)"""
+    """Obtiene los últimos precios con colores (verde/rojo)
+    Combina datos de WebSocket (cryptos) y PriceMonitor (stocks)
+    """
     from services.websocket_service import realtime_price_service
     
     try:
-        prices = realtime_price_service.get_last_prices()
+        # Obtener precios del WebSocket service (cryptos en tiempo real)
+        ws_prices = realtime_price_service.get_last_prices()
+        
+        # Obtener precios de la base de datos (actualizados por PriceMonitor)
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT symbol, current_price, updated_at
+            FROM positions
+            WHERE status = 'open' AND current_price IS NOT NULL
+        """)
+        
+        db_positions = cursor.fetchall()
+        conn.close()
+        
+        # Combinar ambas fuentes
+        prices = {}
+        
+        # Primero agregar precios de la base de datos
+        for symbol, current_price, updated_at in db_positions:
+            if current_price:
+                # Calcular color basado en el cambio de precio (simplificado)
+                prices[symbol] = {
+                    'price': float(current_price),
+                    'color': 'gray',  # Será actualizado por el frontend
+                    'timestamp': updated_at
+                }
+        
+        # Sobrescribir con precios del WebSocket si están disponibles (más recientes)
+        for ticker, data in ws_prices.items():
+            prices[ticker] = data
         
         return jsonify({
             'success': True,

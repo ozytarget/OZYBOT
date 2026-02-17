@@ -211,7 +211,7 @@ export default function Dashboard({ token }) {
                             
                             return (
                                 <tr key={pos.id}>
-                                    <td style={{ fontWeight: 'bold' }}>{pos.ticker}</td>
+                                    <td style={{ fontWeight: 'bold' }}>{pos.symbol}</td>
                                     <td>
                                         <span className={`badge ${pos.side === 'buy' ? 'badge-success' : 'badge-danger'}`}>
                                             {pos.side?.toUpperCase()}
@@ -220,7 +220,7 @@ export default function Dashboard({ token }) {
                                     <td>{pos.remaining_quantity || pos.quantity}</td>
                                     <td>${pos.entry_price?.toFixed(2)}</td>
                                     <td>
-                                        <PriceTicker ticker={pos.ticker} api={api} token={token} />
+                                        <PriceTicker ticker={pos.symbol} api={api} token={token} />
                                     </td>
                                     <td>
                                         <span style={{ 
