@@ -4,6 +4,7 @@ Actualiza automáticamente los precios de activos y recalcula PnL
 """
 import sqlite3
 import time
+import requests
 from threading import Thread
 from datetime import datetime
 
@@ -45,35 +46,60 @@ class PriceMonitor:
         return ticker
     
     def get_current_price(self, ticker):
-        """Obtiene el precio actual de un ticker usando yfinance"""
-        if not YFINANCE_AVAILABLE:
-            return None
-            
+        """Obtiene el precio actual de un ticker usando yfinance o API fallback"""
+        # Primero intentar con yfinance
+        if YFINANCE_AVAILABLE:
+            try:
+                yf_ticker = self.map_ticker(ticker)
+                stock = yf.Ticker(yf_ticker)
+                
+                # Intentar obtener precio actual
+                info = stock.info
+                
+                # Probar diferentes campos en orden de preferencia
+                price = (
+                    info.get('regularMarketPrice') or 
+                    info.get('currentPrice') or
+                    info.get('previousClose')
+                )
+                
+                if price:
+                    return float(price)
+                
+                # Si no hay precio en info, intentar con history
+                hist = stock.history(period='1d', interval='1m')
+                if not hist.empty:
+                    return float(hist['Close'].iloc[-1])
+            except Exception as e:
+                print(f"⚠️ yfinance error para {ticker}: {str(e)}")
+        
+        # Fallback: usar API REST simple para crypto
+        return self.get_price_from_api(ticker)
+    
+    def get_price_from_api(self, ticker):
+        """Fallback: obtiene precio desde APIs REST simples"""
         try:
-            yf_ticker = self.map_ticker(ticker)
-            stock = yf.Ticker(yf_ticker)
+            # Para crypto
+            if ticker.endswith('USD'):
+                base = ticker[:-3]  # BTCUSD -> BTC
+                url = f"https://api.coinbase.com/v2/prices/{base}-USD/spot"
+                response = requests.get(url, timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    return float(data['data']['amount'])
             
-            # Intentar obtener precio actual
-            info = stock.info
-            
-            # Probar diferentes campos en orden de preferencia
-            price = (
-                info.get('regularMarketPrice') or 
-                info.get('currentPrice') or
-                info.get('previousClose')
-            )
-            
-            if price:
-                return float(price)
-            
-            # Si no hay precio en info, intentar con history
-            hist = stock.history(period='1d', interval='1m')
-            if not hist.empty:
-                return float(hist['Close'].iloc[-1])
+            # Para stocks, intentar con API alternativa
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                price = data['chart']['result'][0]['meta'].get('regularMarketPrice')
+                if price:
+                    return float(price)
             
             return None
         except Exception as e:
-            print(f"⚠️ Error obteniendo precio para {ticker}: {str(e)}")
+            print(f"⚠️ API fallback error para {ticker}: {str(e)}")
             return None
     
     def update_positions_prices(self):
@@ -225,13 +251,12 @@ class PriceMonitor:
     
     def start(self):
         """Inicia el monitor en un thread separado"""
-        if not YFINANCE_AVAILABLE:
-            print("⚠️ Price Monitor deshabilitado - yfinance no disponible")
-            return
-            
         if self.running:
             print("⚠️ Price Monitor ya está corriendo")
             return
+        
+        if not YFINANCE_AVAILABLE:
+            print("ℹ️ yfinance no disponible - usando API REST fallback")
         
         self.running = True
         self.thread = Thread(target=self.monitor_loop, daemon=True)
