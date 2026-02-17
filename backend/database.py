@@ -16,7 +16,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT (datetime('now', 'localtime'))
         )
     ''')
     
@@ -61,7 +61,7 @@ def init_db():
             current_price REAL,
             pnl REAL DEFAULT 0.0,
             status TEXT DEFAULT 'open',
-            opened_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            opened_at TIMESTAMP DEFAULT (datetime('now', 'localtime')),
             closed_at TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
@@ -85,7 +85,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS webhooks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             payload TEXT NOT NULL,
-            received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            received_at TIMESTAMP DEFAULT (datetime('now', 'localtime'))
         )
     ''')
     
