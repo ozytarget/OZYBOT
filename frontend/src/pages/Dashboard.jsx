@@ -4,20 +4,26 @@ import { api } from '../api';
 export default function Dashboard({ token }) {
     const [stats, setStats] = useState(null);
     const [positions, setPositions] = useState([]);
+    const [webhooks, setWebhooks] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadData();
+        // Reload data every 10 seconds
+        const interval = setInterval(loadData, 10000);
+        return () => clearInterval(interval);
     }, []);
 
     const loadData = async () => {
         try {
-            const [statsData, positionsData] = await Promise.all([
+            const [statsData, positionsData, webhooksData] = await Promise.all([
                 api.getStats(token),
-                api.getPositions(token)
+                api.getPositions(token),
+                api.getWebhooks(token)
             ]);
             setStats(statsData);
             setPositions(positionsData.positions || []);
+            setWebhooks(webhooksData.webhooks || []);
         } catch (err) {
             console.error('Error loading data:', err);
         } finally {
@@ -79,6 +85,47 @@ export default function Dashboard({ token }) {
                 >
                     {stats?.bot_active ? 'Stop Bot' : 'Start Bot'}
                 </button>
+            </div>
+
+            <div className="card">
+                <h2>Recent Webhooks from TradingView</h2>
+                {webhooks.length === 0 ? (
+                    <p>No webhooks received yet</p>
+                ) : (
+                    <table className="positions-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Ticker</th>
+                                <th>Price</th>
+                                <th>Signal</th>
+                                <th>Payload</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {webhooks.slice(0, 10).map((wh) => {
+                                const payload = typeof wh.payload === 'string' ? JSON.parse(wh.payload) : wh.payload;
+                                return (
+                                    <tr key={wh.id}>
+                                        <td>{new Date(wh.received_at).toLocaleString()}</td>
+                                        <td>{payload.ticker || '-'}</td>
+                                        <td>{payload.price ? `$${payload.price}` : '-'}</td>
+                                        <td>
+                                            {payload.signal ? (
+                                                <span style={{color: payload.signal === 'BUY' ? 'green' : 'red'}}>
+                                                    {payload.signal}
+                                                </span>
+                                            ) : '-'}
+                                        </td>
+                                        <td style={{fontSize: '0.85em', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis'}}>
+                                            {payload.raw_message || JSON.stringify(payload).substring(0, 100)}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                )}
             </div>
 
             <div className="card">

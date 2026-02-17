@@ -60,6 +60,13 @@ export const api = {
         return response.json();
     },
 
+    getWebhooks: async (token) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/webhooks`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return response.json();
+    },
+
     // Settings endpoints
     getConfig: async (token) => {
         const response = await fetch(`${API_BASE_URL}/settings/config`, {
