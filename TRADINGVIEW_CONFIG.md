@@ -3,6 +3,7 @@
 ## ✅ Webhook está funcionando
 
 Tu webhook en Railway **está funcionando correctamente**:
+
 - URL: `https://botz.up.railway.app/webhook`
 - Estado: ✅ Activo y recibiendo datos
 
@@ -19,6 +20,7 @@ Tu webhook en Railway **está funcionando correctamente**:
 En la ventana de alerta:
 
 #### Tab "Settings" (Configuración)
+
 - Configura tu condición de alerta (precio, indicador, etc.)
 
 #### Tab "Notifications" (Notificaciones)
@@ -26,11 +28,13 @@ En la ventana de alerta:
 **IMPORTANTE:** Debes marcar estas opciones:
 
 ✅ **Webhook URL** (obligatorio)
+
 ```
 https://botz.up.railway.app/webhook
 ```
 
 **VERIFICA:**
+
 - ✅ Usa HTTPS (no HTTP)
 - ✅ Sin espacios al inicio o final
 - ✅ Sin barra final (/)
@@ -40,6 +44,7 @@ https://botz.up.railway.app/webhook
 Aquí defines qué datos enviar. Ejemplos:
 
 **Formato Simple:**
+
 ```json
 {
   "ticker": "{{ticker}}",
@@ -49,6 +54,7 @@ Aquí defines qué datos enviar. Ejemplos:
 ```
 
 **Formato con tu mensaje:**
+
 ```json
 {
   "ticker": "{{ticker}}",
@@ -58,6 +64,7 @@ Aquí defines qué datos enviar. Ejemplos:
 ```
 
 **Formato Completo:**
+
 ```json
 {
   "symbol": "{{ticker}}",
@@ -77,12 +84,14 @@ Aquí defines qué datos enviar. Ejemplos:
 ## 🔍 Verificar que Funciona
 
 ### Opción 1: Ver en Dashboard
-1. Abre: https://frontend-woad-five-99.vercel.app
+
+1. Abre: <https://frontend-woad-five-99.vercel.app>
 2. Inicia sesión
 3. Ve a Dashboard
 4. Las alertas recibidas aparecerán en tiempo real
 
 ### Opción 2: Ver Logs en Railway
+
 1. Abre Railway.app
 2. Ve a tu proyecto "OZYBOT"
 3. Haz clic en "View Logs"
@@ -94,7 +103,7 @@ Aquí defines qué datos enviar. Ejemplos:
 
 **Revisa:**
 
-1. **URL correcta:** 
+1. **URL correcta:**
    - ✅ `https://botz.up.railway.app/webhook`
    - ❌ `http://botz.up.railway.app/webhook` (sin HTTPS)
    - ❌ `https://botz.up.railway.app/webhook/` (con barra final)
@@ -113,15 +122,18 @@ Aquí defines qué datos enviar. Ejemplos:
 ### Error de conexión
 
 Si TradingView muestra error:
-- Verifica que Railway esté online: https://botz.up.railway.app/health
+
+- Verifica que Railway esté online: <https://botz.up.railway.app/health>
 - Debe responder: `{"status":"healthy"}`
 
 ## 📱 Ejemplo Completo
 
 **Alerta de Precio:**
+
 - Condición: BTCUSD > 50000
 - Webhook URL: `https://botz.up.railway.app/webhook`
 - Mensaje:
+
 ```json
 {
   "symbol": "BTCUSD",
@@ -132,6 +144,7 @@ Si TradingView muestra error:
 ```
 
 Cuando BTC supere 50k:
+
 1. TradingView dispara alerta
 2. Envía POST a tu webhook
 3. Railway guarda en base de datos
@@ -146,6 +159,7 @@ Invoke-RestMethod -Uri "https://botz.up.railway.app/webhook" -Method Post -Body 
 ```
 
 Debe responder:
+
 ```json
 {
   "status": "received",
