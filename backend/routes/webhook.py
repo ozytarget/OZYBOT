@@ -287,6 +287,3 @@ def process_demo_trade(webhook_data):
     
     conn.commit()
     conn.close()
-    
-    conn.commit()
-    conn.close()
