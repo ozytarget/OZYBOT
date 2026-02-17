@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:5000';
+// Auto-detect environment
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:5000'
+  : 'https://ozybot-production.up.railway.app'; // ⚠️ CAMBIAR POR TU URL DE RAILWAY
 
 export const api = {
   // Auth endpoints
