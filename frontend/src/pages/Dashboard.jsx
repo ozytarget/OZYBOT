@@ -6,6 +6,7 @@ export default function Dashboard({ token }) {
     const [positions, setPositions] = useState([]);
     const [webhooks, setWebhooks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [lastUpdate, setLastUpdate] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -24,6 +25,7 @@ export default function Dashboard({ token }) {
             setStats(statsData);
             setPositions(positionsData.positions || []);
             setWebhooks(webhooksData.webhooks || []);
+            setLastUpdate(new Date());
         } catch (err) {
             console.error('Error loading data:', err);
         } finally {
@@ -64,9 +66,34 @@ export default function Dashboard({ token }) {
 
     if (loading) return <div className="container">Loading...</div>;
 
+    // Calculate unrealized PnL from open positions
+    const unrealizedPnL = positions
+        .filter(pos => pos.status === 'open')
+        .reduce((sum, pos) => sum + (pos.pnl || 0), 0);
+    
+    const realizedProfit = stats?.total_profit || 0;
+    const totalValue = realizedProfit + unrealizedPnL;
+
     return (
         <div className="container">
-            <h1>Dashboard</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h1>Dashboard</h1>
+                <div style={{ textAlign: 'right' }}>
+                    <button 
+                        onClick={loadData} 
+                        className="btn" 
+                        style={{ padding: '0.5rem 1rem', marginBottom: '0.5rem' }}
+                        disabled={loading}
+                    >
+                        🔄 Refresh
+                    </button>
+                    {lastUpdate && (
+                        <div style={{ fontSize: '0.85em', color: '#666' }}>
+                            Last update: {lastUpdate.toLocaleTimeString()}
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <div className="stats-grid">
                 <div className="stat-card">
@@ -78,12 +105,58 @@ export default function Dashboard({ token }) {
                     <div className="value">{stats?.win_rate || 0}%</div>
                 </div>
                 <div className="stat-card">
-                    <h3>Total Profit</h3>
-                    <div className="value">${stats?.total_profit?.toFixed(2) || '0.00'}</div>
+                    <h3>💰 Realized Profit</h3>
+                    <div className="value" style={{ 
+                        color: realizedProfit >= 0 ? '#28a745' : '#dc3545',
+                        fontWeight: 'bold' 
+                    }}>
+                        {realizedProfit >= 0 ? '+' : ''}${realizedProfit.toFixed(2)}
+                    </div>
+                    <div style={{ fontSize: '0.8em', color: '#666', marginTop: '0.25rem' }}>
+                        From closed positions
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <h3>📈 Unrealized PnL</h3>
+                    <div className="value" style={{ 
+                        color: unrealizedPnL >= 0 ? '#28a745' : '#dc3545',
+                        fontWeight: 'bold' 
+                    }}>
+                        {unrealizedPnL >= 0 ? '+' : ''}${unrealizedPnL.toFixed(2)}
+                    </div>
+                    <div style={{ fontSize: '0.8em', color: '#666', marginTop: '0.25rem' }}>
+                        From open positions
+                    </div>
+                </div>
+            </div>
+
+            <div className="stats-grid" style={{ marginTop: '1rem' }}>
+                <div className="stat-card" style={{ 
+                    gridColumn: 'span 2',
+                    backgroundColor: totalValue >= 0 ? '#d4edda' : '#f8d7da',
+                    border: `2px solid ${totalValue >= 0 ? '#28a745' : '#dc3545'}`
+                }}>
+                    <h3 style={{ color: totalValue >= 0 ? '#155724' : '#721c24' }}>
+                        🎯 Total Portfolio Value
+                    </h3>
+                    <div className="value" style={{ 
+                        color: totalValue >= 0 ? '#28a745' : '#dc3545',
+                        fontWeight: 'bold',
+                        fontSize: '2rem'
+                    }}>
+                        {totalValue >= 0 ? '+' : ''}${totalValue.toFixed(2)}
+                    </div>
+                    <div style={{ fontSize: '0.85em', color: totalValue >= 0 ? '#155724' : '#721c24', marginTop: '0.5rem' }}>
+                        Realized + Unrealized
+                    </div>
                 </div>
                 <div className="stat-card">
                     <h3>Open Positions</h3>
                     <div className="value">{stats?.open_positions || 0}</div>
+                </div>
+                <div className="stat-card">
+                    <h3>Closed Positions</h3>
+                    <div className="value">{positions.filter(p => p.status === 'closed').length}</div>
                 </div>
             </div>
 
