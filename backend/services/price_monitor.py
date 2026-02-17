@@ -2,11 +2,18 @@
 Price Monitor Service
 Actualiza automáticamente los precios de activos y recalcula PnL
 """
-import yfinance as yf
 import sqlite3
 import time
 from threading import Thread
 from datetime import datetime
+
+# Import yfinance with error handling
+try:
+    import yfinance as yf
+    YFINANCE_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ yfinance no disponible: {str(e)}")
+    YFINANCE_AVAILABLE = False
 
 class PriceMonitor:
     def __init__(self, db_path='trading_bot.db', update_interval=5):
@@ -39,6 +46,9 @@ class PriceMonitor:
     
     def get_current_price(self, ticker):
         """Obtiene el precio actual de un ticker usando yfinance"""
+        if not YFINANCE_AVAILABLE:
+            return None
+            
         try:
             yf_ticker = self.map_ticker(ticker)
             stock = yf.Ticker(yf_ticker)
@@ -215,6 +225,10 @@ class PriceMonitor:
     
     def start(self):
         """Inicia el monitor en un thread separado"""
+        if not YFINANCE_AVAILABLE:
+            print("⚠️ Price Monitor deshabilitado - yfinance no disponible")
+            return
+            
         if self.running:
             print("⚠️ Price Monitor ya está corriendo")
             return

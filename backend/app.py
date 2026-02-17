@@ -32,13 +32,20 @@ with app.app_context():
         print(f"⚠️ Migration warning: {str(e)}")
 
 # Start Price Monitor for real-time price updates
-print("🚀 Iniciando Price Monitor...")
-price_monitor.start()
+try:
+    print("🚀 Iniciando Price Monitor...")
+    price_monitor.start()
+except Exception as e:
+    print(f"⚠️ Error iniciando Price Monitor: {str(e)}")
+    print("ℹ️ La aplicación continuará sin actualizaciones de precio en tiempo real")
 
 # Clean shutdown
 def cleanup():
-    print("🛑 Deteniendo Price Monitor...")
-    price_monitor.stop()
+    try:
+        print("🛑 Deteniendo Price Monitor...")
+        price_monitor.stop()
+    except Exception as e:
+        print(f"⚠️ Error deteniendo Price Monitor: {str(e)}")
 
 atexit.register(cleanup)
 
