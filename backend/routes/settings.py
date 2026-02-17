@@ -11,7 +11,7 @@ def get_config(user_id):
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent
+        SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent, demo_mode
         FROM bot_config WHERE user_id = ?
     ''', (user_id,))
     
@@ -25,7 +25,8 @@ def get_config(user_id):
         'risk_level': config['risk_level'],
         'max_position_size': config['max_position_size'],
         'stop_loss_percent': config['stop_loss_percent'],
-        'take_profit_percent': config['take_profit_percent']
+        'take_profit_percent': config['take_profit_percent'],
+        'demo_mode': bool(config['demo_mode'])
     }), 200
 
 @settings_bp.route('/config', methods=['PUT'])
@@ -52,6 +53,10 @@ def update_config(user_id):
     if 'take_profit_percent' in data:
         cursor.execute('UPDATE bot_config SET take_profit_percent = ? WHERE user_id = ?',
                        (data['take_profit_percent'], user_id))
+    
+    if 'demo_mode' in data:
+        cursor.execute('UPDATE bot_config SET demo_mode = ? WHERE user_id = ?',
+                       (data['demo_mode'], user_id))
     
     conn.commit()
     conn.close()

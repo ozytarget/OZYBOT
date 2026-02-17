@@ -26,6 +26,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             is_active BOOLEAN DEFAULT 0,
+            demo_mode BOOLEAN DEFAULT 1,
             risk_level TEXT DEFAULT 'medium',
             max_position_size REAL DEFAULT 1000.0,
             stop_loss_percent REAL DEFAULT 2.0,

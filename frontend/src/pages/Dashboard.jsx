@@ -78,6 +78,19 @@ export default function Dashboard({ token }) {
                 <h2>Bot Status</h2>
                 <p style={{ marginBottom: '1rem' }}>
                     Bot is currently: <strong>{stats?.bot_active ? 'Active' : 'Inactive'}</strong>
+                    {stats?.demo_mode && (
+                        <span style={{ 
+                            marginLeft: '1rem',
+                            padding: '0.25rem 0.75rem',
+                            background: '#fff3cd',
+                            color: '#856404',
+                            borderRadius: '4px',
+                            fontSize: '0.9em',
+                            fontWeight: 'bold'
+                        }}>
+                            📊 DEMO MODE
+                        </span>
+                    )}
                 </p>
                 <button
                     className={`btn ${stats?.bot_active ? 'btn-danger' : 'btn-success'}`}

@@ -6,7 +6,8 @@ export default function Settings({ token }) {
         risk_level: 'medium',
         max_position_size: 1000,
         stop_loss_percent: 2,
-        take_profit_percent: 5
+        take_profit_percent: 5,
+        demo_mode: true
     });
     const [broker, setBroker] = useState({
         broker_name: '',
@@ -73,6 +74,20 @@ export default function Settings({ token }) {
             <div className="card">
                 <h2>Bot Configuration</h2>
                 <form onSubmit={handleConfigSubmit}>
+                    <div className="form-group">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={config.demo_mode}
+                                onChange={(e) => setConfig({ ...config, demo_mode: e.target.checked })}
+                                style={{ width: 'auto', marginRight: '0.5rem' }}
+                            />
+                            <strong>DEMO Mode</strong> - Simulate trades without real broker API
+                        </label>
+                        <p style={{ fontSize: '0.9em', color: '#666', marginTop: '0.5rem' }}>
+                            When enabled, the bot will create simulated positions when TradingView alerts arrive, without executing real trades.
+                        </p>
+                    </div>
                     <div className="form-group">
                         <label>Risk Level</label>
                         <select

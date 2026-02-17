@@ -18,6 +18,12 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Initialize database
 with app.app_context():
     init_db()
+    # Run migrations
+    try:
+        from migrations.add_demo_mode import run_migration
+        run_migration()
+    except Exception as e:
+        print(f"⚠️ Migration warning: {str(e)}")
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')

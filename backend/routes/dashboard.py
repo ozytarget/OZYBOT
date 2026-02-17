@@ -18,7 +18,7 @@ def get_stats(user_id):
     stats = cursor.fetchone()
     
     # Get bot status
-    cursor.execute('SELECT is_active FROM bot_config WHERE user_id = ?', (user_id,))
+    cursor.execute('SELECT is_active, demo_mode FROM bot_config WHERE user_id = ?', (user_id,))
     bot_config = cursor.fetchone()
     
     # Get open positions count
@@ -44,6 +44,7 @@ def get_stats(user_id):
         'win_rate': round(win_rate, 2),
         'total_profit': stats['total_profit'],
         'bot_active': bool(bot_config['is_active']),
+        'demo_mode': bool(bot_config['demo_mode']),
         'open_positions': positions_data['open_count']
     }), 200
 
