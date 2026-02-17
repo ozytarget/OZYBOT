@@ -146,38 +146,113 @@ def process_demo_trade(webhook_data):
     price = float(webhook_data.get('price', 0))
     signal = webhook_data.get('signal', '').upper()
     
-    if not ticker or not price or signal not in ['BUY', 'SELL']:
+    if not ticker or not price:
         conn.close()
         print(f"⚠️ Invalid trading signal: {webhook_data}")
         return
     
-    # Create demo positions for each active bot
+    # Process for each active bot
     for bot in active_bots:
         user_id = bot['user_id']
         position_size = bot['max_position_size']
+        stop_loss_pct = bot['stop_loss_percent']
+        take_profit_pct = bot['take_profit_percent']
         
-        # Calculate quantity based on position size
-        quantity = round(position_size / price, 2)
-        
-        # Create demo position
+        # First, update existing open positions for this ticker and check SL/TP
         cursor.execute('''
-            INSERT INTO positions (
-                user_id, symbol, side, quantity, entry_price, 
-                current_price, pnl, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            user_id, ticker, signal, quantity, price,
-            price, 0.0, 'open'
-        ))
+            SELECT id, symbol, side, quantity, entry_price, current_price, pnl
+            FROM positions 
+            WHERE user_id = ? AND symbol = ? AND status = 'open'
+        ''', (user_id, ticker))
         
-        # Update stats
-        cursor.execute('''
-            UPDATE trading_stats 
-            SET total_trades = total_trades + 1
-            WHERE user_id = ?
-        ''', (user_id,))
+        open_positions = cursor.fetchall()
         
-        print(f"💰 DEMO Trade Created - User {user_id}: {signal} {quantity} {ticker} @ ${price}")
+        for pos in open_positions:
+            old_price = pos['current_price'] or pos['entry_price']
+            
+            # Update current price and calculate new PnL
+            if pos['side'] == 'BUY':
+                # For long positions: profit when price goes up
+                pnl = (price - pos['entry_price']) * pos['quantity']
+                pnl_percent = ((price - pos['entry_price']) / pos['entry_price']) * 100
+            else:  # SELL
+                # For short positions: profit when price goes down
+                pnl = (pos['entry_price'] - price) * pos['quantity']
+                pnl_percent = ((pos['entry_price'] - price) / pos['entry_price']) * 100
+            
+            # Update position with new price and PnL
+            cursor.execute('''
+                UPDATE positions 
+                SET current_price = ?, pnl = ?
+                WHERE id = ?
+            ''', (price, pnl, pos['id']))
+            
+            # Check if Stop Loss or Take Profit is triggered
+            should_close = False
+            close_reason = ""
+            
+            if pnl_percent <= -stop_loss_pct:
+                should_close = True
+                close_reason = f"Stop Loss ({pnl_percent:.2f}%)"
+            elif pnl_percent >= take_profit_pct:
+                should_close = True
+                close_reason = f"Take Profit ({pnl_percent:.2f}%)"
+            
+            if should_close:
+                # Close the position
+                cursor.execute('''
+                    UPDATE positions 
+                    SET status = 'closed', closed_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ''', (pos['id'],))
+                
+                # Update trading stats
+                if pnl >= 0:
+                    cursor.execute('''
+                        UPDATE trading_stats 
+                        SET winning_trades = winning_trades + 1,
+                            total_profit = total_profit + ?
+                        WHERE user_id = ?
+                    ''', (pnl, user_id))
+                else:
+                    cursor.execute('''
+                        UPDATE trading_stats 
+                        SET losing_trades = losing_trades + 1,
+                            total_profit = total_profit + ?
+                        WHERE user_id = ?
+                    ''', (pnl, user_id))
+                
+                print(f"🔴 CLOSED Position - User {user_id}: {pos['symbol']} ${price} | {close_reason} | PnL: ${pnl:.2f}")
+            else:
+                print(f"📊 UPDATED Position - User {user_id}: {pos['symbol']} ${old_price} → ${price} | PnL: ${pnl:.2f} ({pnl_percent:+.2f}%)")
+        
+        # Create new position if signal is provided
+        if signal in ['BUY', 'SELL']:
+            # Calculate quantity based on position size
+            quantity = round(position_size / price, 2)
+            
+            # Create demo position
+            cursor.execute('''
+                INSERT INTO positions (
+                    user_id, symbol, side, quantity, entry_price, 
+                    current_price, pnl, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                user_id, ticker, signal, quantity, price,
+                price, 0.0, 'open'
+            ))
+            
+            # Update stats
+            cursor.execute('''
+                UPDATE trading_stats 
+                SET total_trades = total_trades + 1
+                WHERE user_id = ?
+            ''', (user_id,))
+            
+            print(f"💰 OPENED Position - User {user_id}: {signal} {quantity} {ticker} @ ${price}")
+    
+    conn.commit()
+    conn.close()
     
     conn.commit()
     conn.close()
