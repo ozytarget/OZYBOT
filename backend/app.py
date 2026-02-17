@@ -1,7 +1,7 @@
 import os
 import atexit
 from flask import Flask, jsonify
-from flask_CORS import CORS
+from flask_cors import CORS
 from config import Config
 from database import init_db
 from routes.auth import auth_bp
