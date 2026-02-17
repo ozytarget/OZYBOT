@@ -1,0 +1,43 @@
+.price-ticker {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    min-width: 100px;
+    text-align: right;
+    transition: all 0.2s ease;
+}
+
+.price-ticker.green {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+    animation: flashGreen 0.3s ease;
+}
+
+.price-ticker.red {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+    animation: flashRed 0.3s ease;
+}
+
+.price-ticker.gray {
+    color: #6c757d;
+    background-color: rgba(108, 117, 125, 0.1);
+}
+
+.price-ticker.loading {
+    color: #999;
+    background-color: #f0f0f0;
+}
+
+@keyframes flashGreen {
+    0% { background-color: rgba(40, 167, 69, 0.4); }
+    100% { background-color: rgba(40, 167, 69, 0.1); }
+}
+
+@keyframes flashRed {
+    0% { background-color: rgba(220, 53, 69, 0.4); }
+    100% { background-color: rgba(220, 53, 69, 0.1); }
+}

@@ -1,0 +1,50 @@
+.equity-curve {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.equity-curve svg {
+    width: 100%;
+    height: auto;
+}
+
+.equity-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.equity-label {
+    font-size: 0.85em;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.equity-change {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.equity-change.up {
+   color: #28a745;
+}
+
+.equity-change.down {
+    color: #dc3545;
+}
+
+.equity-change.neutral {
+    color: #6c757d;
+}
+
+.equity-curve-empty {
+    padding: 1rem;
+    text-align: center;
+    color: #999;
+    font-size: 0.9em;
+}

@@ -236,3 +236,183 @@ def close_position(user_id, position_id):
         'pnl': pnl,
         'symbol': position['symbol']
     }), 200
+
+
+# ============================================
+# ADVANCED ANALYTICS ENDPOINTS
+# ============================================
+
+@dashboard_bp.route('/analytics', methods=['GET'])
+@token_required
+def get_advanced_analytics(user_id):
+    """Obtiene analytics avanzados: Win Rate, Drawdown, etc."""
+    from services.analytics_service import analytics_service
+    
+    try:
+        analytics = analytics_service.get_full_analytics(user_id)
+        
+        return jsonify({
+            'success': True,
+            'analytics': analytics
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@dashboard_bp.route('/equity-curve', methods=['GET'])
+@token_required
+def get_equity_curve(user_id):
+    """Obtiene la equity curve para el gráfico"""
+    from services.analytics_service import analytics_service
+    
+    try:
+        period_hours = request.args.get('hours', 24, type=int)
+        equity_curve = analytics_service.get_equity_curve(user_id, period_hours)
+        
+        return jsonify({
+            'success': True,
+            'equity_curve': equity_curve
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@dashboard_bp.route('/connection-status', methods=['GET'])
+def get_connection_status():
+    """Obtiene el status de conexión para el LED indicator"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT source, status, last_update, latency_ms
+            FROM connection_status
+            ORDER BY last_update DESC
+            LIMIT 1
+        """)
+        
+        status = cursor.fetchone()
+        conn.close()
+        
+        if status:
+            return jsonify({
+                'success': True,
+                'source': status['source'],
+                'status': status['status'],
+                'last_update': status['last_update'],
+                'latency_ms': status['latency_ms']
+            }), 200
+        else:
+            return jsonify({
+                'success': True,
+                'source': 'Unknown',
+                'status': 'disconnected',
+                'last_update': None,
+                'latency_ms': 0
+            }), 200
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@dashboard_bp.route('/realtime-prices', methods=['GET'])
+def get_realtime_prices():
+    """Obtiene los últimos precios con colores (verde/rojo)"""
+    from services.websocket_service import realtime_price_service
+    
+    try:
+        prices = realtime_price_service.get_last_prices()
+        
+        return jsonify({
+            'success': True,
+            'prices': prices
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@dashboard_bp.route('/partial-closes/<int:position_id>', methods=['GET'])
+@token_required
+def get_partial_closes(user_id, position_id):
+    """Obtiene los cierres parciales de una posición"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Verificar que la posición pertenece al usuario
+        cursor.execute("""
+            SELECT id FROM positions
+            WHERE id = ? AND user_id = ?
+        """, (position_id, user_id))
+        
+        if not cursor.fetchone():
+            return jsonify({'error': 'Position not found'}), 404
+        
+        # Obtener cierres parciales
+        cursor.execute("""
+            SELECT id, quantity, price, reason, closed_at
+            FROM partial_closes
+            WHERE position_id = ?
+            ORDER BY closed_at DESC
+        """, (position_id,))
+        
+        closes = cursor.fetchall()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'partial_closes': [dict(close) for close in closes]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@dashboard_bp.route('/trade-logs', methods=['GET'])
+@token_required
+def get_trade_logs(user_id):
+    """Obtiene los logs forenses de todos los trades"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT tl.*, p.symbol, p.side, p.entry_price, p.exit_price, p.pnl
+            FROM trade_logs tl
+            JOIN positions p ON tl.position_id = p.id
+            WHERE p.user_id = ?
+            ORDER BY tl.logged_at DESC
+            LIMIT 100
+        """, (user_id,))
+        
+        logs = cursor.fetchall()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'logs': [dict(log) for log in logs]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

@@ -1,14 +1,20 @@
 import os
 import atexit
 from flask import Flask, jsonify
-from flask_cors import CORS
+from flask_CORS import CORS
 from config import Config
 from database import init_db
 from routes.auth import auth_bp
 from routes.dashboard import dashboard_bp
 from routes.settings import settings_bp
 from routes.webhook import webhook_bp
-from services.price_monitor import price_monitor
+from services import (
+    price_monitor,
+    trading_engine,
+    realtime_price_service,
+    notification_service,
+    analytics_service
+)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -28,24 +34,34 @@ with app.app_context():
         run_auto_close_migration()
         from migrations.repair_database import repair_database
         repair_database()
+        from migrations.add_risk_management import run_migration as run_risk_migration
+        run_risk_migration()
     except Exception as e:
         print(f"⚠️ Migration warning: {str(e)}")
 
-# Start Price Monitor for real-time price updates
+# Start Professional Trading Services
+print("🚀 Iniciando Price Monitor...")
 try:
-    print("🚀 Iniciando Price Monitor...")
     price_monitor.start()
 except Exception as e:
     print(f"⚠️ Error iniciando Price Monitor: {str(e)}")
-    print("ℹ️ La aplicación continuará sin actualizaciones de precio en tiempo real")
+
+print("🔌 Iniciando WebSocket Service (Real-Time Prices)...")
+try:
+    realtime_price_service.start()
+except Exception as e:
+    print(f"⚠️ Error iniciando WebSocket Service: {str(e)}")
+
+print("✅ Servicios profesionales iniciados")
 
 # Clean shutdown
 def cleanup():
     try:
-        print("🛑 Deteniendo Price Monitor...")
+        print("🛑 Deteniendo servicios...")
         price_monitor.stop()
+        realtime_price_service.stop()
     except Exception as e:
-        print(f"⚠️ Error deteniendo Price Monitor: {str(e)}")
+        print(f"⚠️ Error deteniendo servicios: {str(e)}")
 
 atexit.register(cleanup)
 

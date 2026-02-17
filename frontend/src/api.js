@@ -119,5 +119,47 @@ export const api = {
             body: JSON.stringify(broker)
         });
         return response.json();
+    },
+
+    // ============================================
+    // ADVANCED ANALYTICS ENDPOINTS
+    // ============================================
+
+    getAdvancedAnalytics: async (token) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/analytics`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return response.json();
+    },
+
+    getEquityCurve: async (token, hours = 24) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/equity-curve?hours=${hours}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return response.json();
+    },
+
+    getConnectionStatus: async () => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/connection-status`);
+        return response.json();
+    },
+
+    getRealtimePrices: async (token) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/realtime-prices`);
+        return response.json();
+    },
+
+    getPartialCloses: async (token, positionId) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/partial-closes/${positionId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return response.json();
+    },
+
+    getTradeLogs: async (token) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/trade-logs`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return response.json();
     }
 };
