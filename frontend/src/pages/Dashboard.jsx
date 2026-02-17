@@ -27,10 +27,19 @@ export default function Dashboard({ token }) {
 
     const handleToggleBot = async () => {
         try {
+            setLoading(true);
             const result = await api.toggleBot(token);
-            setStats({ ...stats, bot_active: result.is_active });
+            if (result.error) {
+                alert(`Error: ${result.error}`);
+            } else {
+                setStats({ ...stats, bot_active: result.is_active });
+                alert(`Bot ${result.is_active ? 'activated' : 'deactivated'} successfully!`);
+            }
         } catch (err) {
             console.error('Error toggling bot:', err);
+            alert(`Failed to toggle bot: ${err.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 

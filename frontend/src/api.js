@@ -48,8 +48,15 @@ export const api = {
     toggleBot: async (token) => {
         const response = await fetch(`${API_BASE_URL}/dashboard/toggle-bot`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to toggle bot');
+        }
         return response.json();
     },
 
