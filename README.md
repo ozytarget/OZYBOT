@@ -1,6 +1,12 @@
-# Trading Bot - Full Stack Application
+# 🤖 OZYBOT - Trading Bot Full Stack
 
-A full-stack trading bot application with Python Flask backend and React frontend. Features include user authentication, dashboard with trading statistics, position tracking, and configurable bot settings.
+Trading bot automatizado con Python Flask backend y React frontend. Recibe señales de TradingView y ejecuta operaciones automáticamente.
+
+## 🌐 Demo en Producción
+
+- **Backend API:** Desplegado en Railway
+- **Frontend Web:** Despliega en Vercel (ver instrucciones abajo)
+- **GitHub:** https://github.com/ozytarget/OZYBOT
 
 ## Features
 

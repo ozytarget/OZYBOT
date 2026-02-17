@@ -1,0 +1,13 @@
+# Build output
+dist
+.vercel
+
+# Dependencies  
+node_modules
+
+# Environment
+.env
+.env.local
+
+# Others
+.DS_Store
