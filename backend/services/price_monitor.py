@@ -4,9 +4,16 @@ Actualiza automáticamente los precios de activos y recalcula PnL
 """
 import sqlite3
 import time
-import requests
 from threading import Thread
 from datetime import datetime
+
+# Import requests with error handling
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ requests no disponible: {str(e)}")
+    REQUESTS_AVAILABLE = False
 
 # Import yfinance with error handling
 try:
@@ -78,6 +85,9 @@ class PriceMonitor:
     
     def get_price_from_api(self, ticker):
         """Fallback: obtiene precio desde APIs REST simples"""
+        if not REQUESTS_AVAILABLE:
+            return None
+            
         try:
             # Para crypto
             if ticker.endswith('USD'):

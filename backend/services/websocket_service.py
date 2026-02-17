@@ -3,12 +3,20 @@ WebSocket Service para precios en tiempo real
 Conecta con Binance, Alpaca, o Twelve Data
 """
 import json
-import asyncio
-import websockets
 import sqlite3
-from datetime import datetime
-from threading import Thread
 import time
+from threading import Thread
+from datetime import datetime
+
+# Import asyncio and websockets with error handling
+try:
+    import asyncio
+    import websockets
+    WEBSOCKETS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ websockets no disponible: {str(e)}")
+    WEBSOCKETS_AVAILABLE = False
+    asyncio = None
 
 class RealTimePriceService:
     def __init__(self, db_path='trading_bot.db'):
@@ -179,6 +187,10 @@ class RealTimePriceService:
     
     def start(self):
         """Inicia el servicio de WebSocket en thread separado"""
+        if not WEBSOCKETS_AVAILABLE:
+            print("⚠️ WebSocket Service deshabilitado - websockets no disponible")
+            return
+            
         if self.running:
             print("⚠️ WebSocket Service ya está corriendo")
             return

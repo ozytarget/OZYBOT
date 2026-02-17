@@ -2,10 +2,17 @@
 Sistema de Notificaciones para Telegram y Discord
 Envía alertas cuando se abren/cierran operaciones
 """
-import requests
 import json
 import os
 from datetime import datetime
+
+# Import requests with error handling
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ requests no disponible - notificaciones deshabilitadas: {str(e)}")
+    REQUESTS_AVAILABLE = False
 
 class NotificationService:
     def __init__(self):
@@ -15,6 +22,10 @@ class NotificationService:
         
     def send_telegram_message(self, message):
         """Envía mensaje a Telegram"""
+        if not REQUESTS_AVAILABLE:
+            print("⚠️ requests not available - cannot send Telegram notification")
+            return False
+            
         if not self.telegram_bot_token or not self.telegram_chat_id:
             print("⚠️ Telegram credentials not configured")
             return False
@@ -42,6 +53,10 @@ class NotificationService:
     
     def send_discord_message(self, message, color=None):
         """Envía mensaje a Discord"""
+        if not REQUESTS_AVAILABLE:
+            print("⚠️ requests not available - cannot send Discord notification")
+            return False
+            
         if not self.discord_webhook_url:
             print("⚠️ Discord webhook not configured")
             return False
