@@ -77,30 +77,30 @@ def cleanup():
         print(f"⚠️ Error deteniendo servicios: {str(e)}")
 
 atexit.register(cleanup)
-app.register_blueprint(safety_bp, url_prefix='/safety')
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 app.register_blueprint(settings_bp, url_prefix='/settings')
 app.register_blueprint(webhook_bp, url_prefix='/webhook')
+app.register_blueprint(safety_bp, url_prefix='/safety')
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
-def health_check():2.0.0-PRO',
+def health_check():
+    return jsonify({'status': 'healthy'}), 200
+
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify({
+        'message': 'Trading Bot API',
+        'version': '2.0.0-PRO',
         'endpoints': {
             'auth': '/auth/register, /auth/login, /auth/me',
             'dashboard': '/dashboard/stats, /dashboard/positions, /dashboard/toggle-bot',
             'settings': '/settings/config, /settings/broker',
             'webhook': '/webhook',
-            'safety': '/safety/panic/kill-switch, /safety/heartbeat/status, /safety/cooldowns/active, /safety/slippage/stats
-        'message': 'Trading Bot API',
-        'version': '1.0.0',
-        'endpoints': {
-            'auth': '/auth/register, /auth/login, /auth/me',
-            'dashboard': '/dashboard/stats, /dashboard/positions, /dashboard/toggle-bot',
-            'settings': '/settings/config, /settings/broker',
-            'webhook': '/webhook'
+            'safety': '/safety/panic/kill-switch, /safety/heartbeat/status, /safety/cooldowns/active, /safety/slippage/stats'
         }
     }), 200
 
