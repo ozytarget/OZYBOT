@@ -197,6 +197,7 @@ equity_curve
 ## 🔑 COMANDOS IMPORTANTES
 
 ### **Backend (local):**
+
 ```bash
 cd backend
 python app.py
@@ -204,6 +205,7 @@ python app.py
 ```
 
 ### **Frontend (local):**
+
 ```bash
 cd frontend
 npm run dev
@@ -211,6 +213,7 @@ npm run dev
 ```
 
 ### **Deploy:**
+
 ```bash
 git add .
 git commit -m "Tu mensaje"
@@ -220,6 +223,7 @@ git push origin main
 ```
 
 ### **Database:**
+
 ```bash
 cd backend
 sqlite3 trading_bot.db
@@ -231,6 +235,7 @@ sqlite3 trading_bot.db
 ## 📦 DEPENDENCIAS CLAVE
 
 ### **Backend:**
+
 ```
 Flask 3.0.0          # Web framework
 Flask-CORS 4.0.0     # Permite requests desde frontend
@@ -242,6 +247,7 @@ requests 2.31.0      # HTTP client
 ```
 
 ### **Frontend:**
+
 ```
 react 18.2.0         # UI library
 react-dom 18.2.0     # React DOM
@@ -291,17 +297,20 @@ vite 5.0.8           # Build tool
 ## ⚡ QUICK REFERENCE
 
 ### **URLs:**
-- **Frontend:** https://frontend-woad-five-99.vercel.app
-- **Backend:** https://copilot-bot-production-xxxx.railway.app
-- **GitHub:** https://github.com/ozytarget/OZYBOT
+
+- **Frontend:** <https://frontend-woad-five-99.vercel.app>
+- **Backend:** <https://copilot-bot-production-xxxx.railway.app>
+- **GitHub:** <https://github.com/ozytarget/OZYBOT>
 
 ### **Estado Actual:**
+
 - ✅ DEMO Mode activo
 - ✅ Real-time prices funcionando
 - ✅ Todas las features profesionales OK
 - ⏳ LIVE Mode pendiente (API keys)
 
 ### **Next Steps:**
+
 1. Obtener API Keys de Alpaca (paper trading)
 2. Agregar a Railway environment variables
 3. Cambiar demo_mode a 0

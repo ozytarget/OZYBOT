@@ -8,12 +8,17 @@ from routes.auth import auth_bp
 from routes.dashboard import dashboard_bp
 from routes.settings import settings_bp
 from routes.webhook import webhook_bp
+from routes.safety import safety_bp
 from services import (
     price_monitor,
     trading_engine,
     realtime_price_service,
     notification_service,
-    analytics_service
+    analytics_service,
+    panic_service,
+    heartbeat_monitor,
+    cooldown_manager,
+    slippage_tracker
 )
 
 # Initialize Flask app
@@ -36,6 +41,8 @@ with app.app_context():
         repair_database()
         from migrations.add_risk_management import run_migration as run_risk_migration
         run_risk_migration()
+        from migrations.add_professional_safety import run_migration as run_safety_migration
+        run_safety_migration()
     except Exception as e:
         print(f"⚠️ Migration warning: {str(e)}")
 
@@ -52,6 +59,12 @@ try:
 except Exception as e:
     print(f"⚠️ Error iniciando WebSocket Service: {str(e)}")
 
+print("💓 Iniciando Heartbeat Monitor...")
+try:
+    heartbeat_monitor.start()
+except Exception as e:
+    print(f"⚠️ Error iniciando Heartbeat Monitor: {str(e)}")
+
 print("✅ Servicios profesionales iniciados")
 
 # Clean shutdown
@@ -64,6 +77,7 @@ def cleanup():
         print(f"⚠️ Error deteniendo servicios: {str(e)}")
 
 atexit.register(cleanup)
+app.register_blueprint(safety_bp, url_prefix='/safety')
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -73,12 +87,13 @@ app.register_blueprint(webhook_bp, url_prefix='/webhook')
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({'status': 'healthy'}), 200
-
-@app.route('/', methods=['GET'])
-def root():
-    return jsonify({
+def health_check():2.0.0-PRO',
+        'endpoints': {
+            'auth': '/auth/register, /auth/login, /auth/me',
+            'dashboard': '/dashboard/stats, /dashboard/positions, /dashboard/toggle-bot',
+            'settings': '/settings/config, /settings/broker',
+            'webhook': '/webhook',
+            'safety': '/safety/panic/kill-switch, /safety/heartbeat/status, /safety/cooldowns/active, /safety/slippage/stats
         'message': 'Trading Bot API',
         'version': '1.0.0',
         'endpoints': {

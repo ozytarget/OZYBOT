@@ -1,0 +1,264 @@
+.panic-button-container {
+  position: relative;
+  display: inline-block;
+}
+
+.panic-button {
+  background: linear-gradient(135deg, #ff0000, #cc0000);
+  border: 3px solid #fff;
+  border-radius: 12px;
+  padding: 16px 32px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: pulse 2s infinite;
+}
+
+.panic-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(255, 0, 0, 0.6);
+  animation: none;
+}
+
+.panic-button:active {
+  transform: scale(0.98);
+}
+
+.panic-icon {
+  font-size: 24px;
+  animation: shake 0.5s infinite;
+}
+
+.panic-text {
+  letter-spacing: 1px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(255, 0, 0, 0.7);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+/* Confirmation Modal */
+.panic-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+.panic-confirm-content {
+  background: #1a1a1a;
+  border: 3px solid #ff0000;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  color: white;
+  box-shadow: 0 10px 50px rgba(255, 0, 0, 0.5);
+  animation: slideIn 0.3s ease;
+}
+
+.panic-confirm-content h3 {
+  margin: 0 0 20px 0;
+  color: #ff0000;
+  font-size: 24px;
+  text-align: center;
+}
+
+.panic-confirm-content p {
+  margin: 12px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.panic-confirm-content ul {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.panic-confirm-content ul li {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.panic-warning {
+  background: rgba(255, 0, 0, 0.1);
+  border-left: 4px solid #ff0000;
+  padding: 12px;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+
+.panic-confirm-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.panic-confirm-yes {
+  flex: 1;
+  background: #ff0000;
+  border: 2px solid #fff;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.panic-confirm-yes:hover:not(:disabled) {
+  background: #cc0000;
+  transform: scale(1.02);
+}
+
+.panic-confirm-yes:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panic-confirm-no {
+  flex: 1;
+  background: transparent;
+  border: 2px solid #666;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.panic-confirm-no:hover:not(:disabled) {
+  border-color: #999;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Result Message */
+.panic-result {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  animation: slideInRight 0.3s ease;
+}
+
+.panic-result.success {
+  border: 2px solid #00ff00;
+}
+
+.panic-result.error {
+  border: 2px solid #ff0000;
+}
+
+.panic-result-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.panic-result-icon {
+  font-size: 28px;
+}
+
+.panic-result-message {
+  flex: 1;
+  color: white;
+}
+
+.panic-result-message strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.panic-result-message p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.panic-result-details {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panic-result-details p {
+  font-size: 13px;
+  color: #aaa;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .panic-confirm-content {
+    margin: 20px;
+    padding: 24px;
+  }
+
+  .panic-result {
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+  }
+}

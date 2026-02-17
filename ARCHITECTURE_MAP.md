@@ -96,6 +96,7 @@ copilot-bot/
 ```
 
 **Payload JSON:**
+
 ```json
 {
   "ticker": "AMZN",
@@ -310,6 +311,7 @@ copilot-bot/
 ```
 
 ### **Relaciones:**
+
 ```
 users (1) ─────────── (N) positions
 users (1) ─────────── (1) trading_stats
@@ -596,12 +598,14 @@ App.jsx
 ## 🎯 PUNTOS CLAVE
 
 ### **Tecnologías Core:**
+
 - **Backend:** Python 3.11, Flask 3.0, SQLite, WebSockets
 - **Frontend:** React 18, Vite 5, React Router 6
 - **Deployment:** Railway (backend), Vercel (frontend)
 - **Real-Time:** Binance WebSocket, Yahoo Finance REST API
 
 ### **Servicios Background:**
+
 1. **price_monitor.py:** Actualiza precios cada 5 segundos
 2. **websocket_service.py:** Stream de Binance para cryptos
 3. **trading_engine.py:** Trailing stops, break-even, parciales
@@ -609,12 +613,14 @@ App.jsx
 5. **notification_service.py:** Telegram/Discord (opcional)
 
 ### **Estado Actual:**
+
 - ✅ DEMO Mode activo (simulado, sin dinero real)
 - ✅ Real-time prices funcionando
 - ✅ Todas las features profesionales implementadas
 - ⏳ LIVE Mode pendiente (requiere API keys de broker)
 
 ### **Próximos Pasos:**
+
 1. Configurar Alpaca API para Paper Trading
 2. Implementar broker_integration.py completo
 3. Agregar toggle DEMO/LIVE en Settings
@@ -639,6 +645,7 @@ App.jsx
 ## 🔍 DEBUGGING & LOGS
 
 ### **Backend Logs (Railway):**
+
 ```bash
 railway logs
 # Ver:
@@ -648,6 +655,7 @@ railway logs
 ```
 
 ### **Frontend Dev Console:**
+
 ```javascript
 // Ver network requests:
 // - GET /dashboard/stats → 200 OK
@@ -655,6 +663,7 @@ railway logs
 ```
 
 ### **Database Inspection:**
+
 ```bash
 cd backend
 sqlite3 trading_bot.db
@@ -669,11 +678,11 @@ sqlite3 trading_bot.db
 
 Para entender mejor cada componente:
 
-- **Flask:** https://flask.palletsprojects.com/
-- **React:** https://react.dev/
-- **WebSockets:** https://websockets.readthedocs.io/
-- **TradingView Webhooks:** https://www.tradingview.com/support/solutions/43000529348
-- **Alpaca API:** https://alpaca.markets/docs/
+- **Flask:** <https://flask.palletsprojects.com/>
+- **React:** <https://react.dev/>
+- **WebSockets:** <https://websockets.readthedocs.io/>
+- **TradingView Webhooks:** <https://www.tradingview.com/support/solutions/43000529348>
+- **Alpaca API:** <https://alpaca.markets/docs/>
 
 ---
 

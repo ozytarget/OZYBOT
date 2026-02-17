@@ -3,6 +3,8 @@ from auth_utils import token_required
 from database import get_db_connection
 from datetime import datetime
 import json
+from services.cooldown_manager import cooldown_manager
+from services.slippage_tracker import slippage_tracker
 
 webhook_bp = Blueprint('webhook', __name__)
 
@@ -151,6 +153,13 @@ def process_demo_trade(webhook_data):
         print(f"⚠️ Invalid trading signal: {webhook_data}")
         return
     
+    # ✅ CHECK COOLDOWN BEFORE PROCESSING SIGNAL
+    cooldown_status = cooldown_manager.is_ticker_in_cooldown(ticker)
+    if cooldown_status['in_cooldown']:
+        print(f"❄️ COOLDOWN ACTIVE - {ticker} is in cooldown for {cooldown_status['time_remaining_minutes']} minutes. Skipping signal.")
+        conn.close()
+        return
+    
     # Process for each active bot
     for bot in active_bots:
         user_id = bot['user_id']
@@ -208,6 +217,15 @@ def process_demo_trade(webhook_data):
                     WHERE id = ?
                 ''', (pos['id'],))
                 
+                # ✅ ACTIVATE COOLDOWN IF STOP LOSS
+                if "Stop Loss" in close_reason:
+                    cooldown_result = cooldown_manager.activate_cooldown(
+                        ticker=ticker,
+                        reason=f"Stop Loss triggered at ${price}",
+                        duration_minutes=60
+                    )
+                    print(f"❄️ COOLDOWN ACTIVATED - {ticker} locked for 60 minutes after Stop Loss")
+                
                 # Update trading stats
                 if pnl >= 0:
                     cursor.execute('''
@@ -235,6 +253,22 @@ def process_demo_trade(webhook_data):
             
             # Create demo position
             cursor.execute('''
+            position_id = cursor.lastrowid
+            
+            # ✅ RECORD SLIPPAGE (TradingView expected price vs actual execution)
+            # In DEMO mode, expected = actual, but in LIVE this would capture real slippage
+            try:
+                slippage_tracker.record_slippage(
+                    position_id=position_id,
+                    ticker=ticker,
+                    expected_price=price,  # From TradingView
+                    actual_price=price,    # In DEMO, same. In LIVE, broker execution price
+                    quantity=quantity,
+                    side=signal
+                )
+            except Exception as e:
+                print(f"⚠️ Error recording slippage: {str(e)}")
+            
                 INSERT INTO positions (
                     user_id, symbol, side, quantity, entry_price, 
                     current_price, pnl, status

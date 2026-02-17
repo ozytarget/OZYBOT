@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api';
+import PanicButton from '../components/PanicButton';
 
 export default function Dashboard({ token }) {
     const [stats, setStats] = useState(null);
@@ -178,12 +179,15 @@ export default function Dashboard({ token }) {
                         </span>
                     )}
                 </p>
-                <button
-                    className={`btn ${stats?.bot_active ? 'btn-danger' : 'btn-success'}`}
-                    onClick={handleToggleBot}
-                >
-                    {stats?.bot_active ? 'Stop Bot' : 'Start Bot'}
-                </button>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <button
+                        className={`btn ${stats?.bot_active ? 'btn-danger' : 'btn-success'}`}
+                        onClick={handleToggleBot}
+                    >
+                        {stats?.bot_active ? 'Stop Bot' : 'Start Bot'}
+                    </button>
+                    <PanicButton />
+                </div>
             </div>
 
             <div className="card">
