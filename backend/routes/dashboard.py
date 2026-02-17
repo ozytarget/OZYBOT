@@ -177,3 +177,62 @@ def get_webhooks(user_id):
         })
     
     return jsonify({'webhooks': webhooks_list}), 200
+
+@dashboard_bp.route('/close-position/<int:position_id>', methods=['POST'])
+@token_required
+def close_position(user_id, position_id):
+    """Manually close a position"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get position and verify ownership
+    cursor.execute('''
+        SELECT id, symbol, side, quantity, entry_price, current_price, pnl, status
+        FROM positions 
+        WHERE id = ? AND user_id = ?
+    ''', (position_id, user_id))
+    
+    position = cursor.fetchone()
+    
+    if not position:
+        conn.close()
+        return jsonify({'error': 'Position not found'}), 404
+    
+    if position['status'] != 'open':
+        conn.close()
+        return jsonify({'error': 'Position already closed'}), 400
+    
+    # Close the position
+    cursor.execute('''
+        UPDATE positions 
+        SET status = 'closed', closed_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (position_id,))
+    
+    # Update trading stats
+    pnl = position['pnl'] or 0.0
+    
+    if pnl >= 0:
+        cursor.execute('''
+            UPDATE trading_stats 
+            SET winning_trades = winning_trades + 1,
+                total_profit = total_profit + ?
+            WHERE user_id = ?
+        ''', (pnl, user_id))
+    else:
+        cursor.execute('''
+            UPDATE trading_stats 
+            SET losing_trades = losing_trades + 1,
+                total_profit = total_profit + ?
+            WHERE user_id = ?
+        ''', (pnl, user_id))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'message': 'Position closed successfully',
+        'position_id': position_id,
+        'pnl': pnl,
+        'symbol': position['symbol']
+    }), 200

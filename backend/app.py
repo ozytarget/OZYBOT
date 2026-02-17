@@ -22,6 +22,8 @@ with app.app_context():
     try:
         from migrations.add_demo_mode import run_migration
         run_migration()
+        from migrations.add_auto_close import run_migration as run_auto_close_migration
+        run_auto_close_migration()
         from migrations.repair_database import repair_database
         repair_database()
     except Exception as e:

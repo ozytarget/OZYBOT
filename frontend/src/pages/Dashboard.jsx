@@ -49,6 +49,19 @@ export default function Dashboard({ token }) {
         }
     };
 
+    const handleClosePosition = async (positionId, symbol) => {
+        if (!confirm(`Close position ${symbol}?`)) {
+            return;
+        }
+        
+        try {
+            await api.closePosition(token, positionId);
+            await loadData(); // Reload positions
+        } catch (err) {
+            alert(err.message || 'Failed to close position');
+        }
+    };
+
     if (loading) return <div className="container">Loading...</div>;
 
     return (
@@ -142,7 +155,7 @@ export default function Dashboard({ token }) {
             </div>
 
             <div className="card">
-                <h2>Recent Positions</h2>
+                <h2>Active Positions</h2>
                 {positions.length === 0 ? (
                     <p>No positions yet</p>
                 ) : (
@@ -151,27 +164,82 @@ export default function Dashboard({ token }) {
                             <tr>
                                 <th>Symbol</th>
                                 <th>Side</th>
-                                <th>Quantity</th>
-                                <th>Entry Price</th>
+                                <th>Qty</th>
+                                <th>Entry</th>
+                                <th>Current</th>
                                 <th>PnL</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {positions.map((pos) => (
-                                <tr key={pos.id}>
-                                    <td>{pos.symbol}</td>
-                                    <td>{pos.side}</td>
-                                    <td>{pos.quantity}</td>
-                                    <td>${pos.entry_price}</td>
-                                    <td style={{ color: pos.pnl >= 0 ? 'green' : 'red' }}>
-                                        ${pos.pnl?.toFixed(2)}
-                                    </td>
-                                    <td>
-                                        <span className={`status ${pos.status}`}>{pos.status}</span>
-                                    </td>
-                                </tr>
-                            ))}
+                            {positions.map((pos) => {
+                                const pnl = pos.pnl || 0;
+                                const pnlPercent = pos.entry_price ? ((pos.current_price - pos.entry_price) / pos.entry_price * 100) : 0;
+                                const isOpen = pos.status === 'open';
+                                
+                                return (
+                                    <tr key={pos.id} style={{ backgroundColor: isOpen ? 'transparent' : '#f5f5f5' }}>
+                                        <td><strong>{pos.symbol}</strong></td>
+                                        <td>
+                                            <span style={{
+                                                color: pos.side === 'BUY' ? '#28a745' : '#dc3545',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                {pos.side}
+                                            </span>
+                                        </td>
+                                        <td>{pos.quantity}</td>
+                                        <td>${pos.entry_price?.toFixed(2)}</td>
+                                        <td>${pos.current_price?.toFixed(2)}</td>
+                                        <td>
+                                            <div>
+                                                <div style={{ 
+                                                    color: pnl >= 0 ? '#28a745' : '#dc3545',
+                                                    fontWeight: 'bold'
+                                                }}>
+                                                    {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
+                                                </div>
+                                                <div style={{ fontSize: '0.85em', color: pnl >= 0 ? '#28a745' : '#dc3545' }}>
+                                                    ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span className={`status ${pos.status}`} style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.85em',
+                                                backgroundColor: isOpen ? '#28a745' : '#666',
+                                                color: 'white'
+                                            }}>
+                                                {pos.status.toUpperCase()}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {isOpen ? (
+                                                <button
+                                                    onClick={() => handleClosePosition(pos.id, pos.symbol)}
+                                                    className="btn"
+                                                    style={{
+                                                        padding: '4px 12px',
+                                                        fontSize: '0.85em',
+                                                        backgroundColor: '#dc3545',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        borderRadius: '4px'
+                                                    }}
+                                                >
+                                                    Close
+                                                </button>
+                                            ) : (
+                                                <span style={{ color: '#999', fontSize: '0.85em' }}>-</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 )}

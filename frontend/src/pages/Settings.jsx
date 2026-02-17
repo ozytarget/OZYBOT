@@ -7,7 +7,8 @@ export default function Settings({ token }) {
         max_position_size: 1000,
         stop_loss_percent: 2,
         take_profit_percent: 5,
-        demo_mode: true
+        demo_mode: true,
+        auto_close_enabled: true
     });
     const [broker, setBroker] = useState({
         broker_name: '',
@@ -72,60 +73,138 @@ export default function Settings({ token }) {
             )}
 
             <div className="card">
-                <h2>Bot Configuration</h2>
+                <h2>⚙️ Bot Configuration</h2>
                 <form onSubmit={handleConfigSubmit}>
-                    <div className="form-group">
-                        <label>
+                    
+                    {/* Trading Mode Section */}
+                    <div style={{ 
+                        padding: '1rem', 
+                        backgroundColor: '#f8f9fa', 
+                        borderRadius: '8px', 
+                        marginBottom: '1.5rem',
+                        border: '1px solid #dee2e6'
+                    }}>
+                        <h3 style={{ marginTop: 0, fontSize: '1.1rem', color: '#495057' }}>Trading Mode</h3>
+                        
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={config.demo_mode}
+                                    onChange={(e) => setConfig({ ...config, demo_mode: e.target.checked })}
+                                    style={{ width: 'auto', marginRight: '0.75rem', transform: 'scale(1.2)' }}
+                                />
+                                <div>
+                                    <strong style={{ fontSize: '1rem' }}>📊 DEMO Mode</strong>
+                                    <p style={{ fontSize: '0.85em', color: '#666', margin: '0.25rem 0 0 0' }}>
+                                        Simulate trades without executing real orders through your broker. Perfect for testing strategies.
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Risk Management Section */}
+                    <div style={{ 
+                        padding: '1rem', 
+                        backgroundColor: '#fff3cd', 
+                        borderRadius: '8px', 
+                        marginBottom: '1.5rem',
+                        border: '1px solid #ffc107'
+                    }}>
+                        <h3 style={{ marginTop: 0, fontSize: '1.1rem', color: '#856404' }}>🛡️ Risk Management</h3>
+                        
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={config.auto_close_enabled}
+                                    onChange={(e) => setConfig({ ...config, auto_close_enabled: e.target.checked })}
+                                    style={{ width: 'auto', marginRight: '0.75rem', transform: 'scale(1.2)' }}
+                                />
+                                <div>
+                                    <strong style={{ fontSize: '1rem' }}>🤖 Automatic Stop Loss / Take Profit</strong>
+                                    <p style={{ fontSize: '0.85em', color: '#856404', margin: '0.25rem 0 0 0' }}>
+                                        Automatically close positions when Stop Loss or Take Profit levels are reached. Recommended for risk protection.
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Stop Loss (%)</label>
                             <input
-                                type="checkbox"
-                                checked={config.demo_mode}
-                                onChange={(e) => setConfig({ ...config, demo_mode: e.target.checked })}
-                                style={{ width: 'auto', marginRight: '0.5rem' }}
+                                type="number"
+                                step="0.1"
+                                value={config.stop_loss_percent}
+                                onChange={(e) => setConfig({ ...config, stop_loss_percent: parseFloat(e.target.value) })}
+                                placeholder="e.g., 2 for 2% loss"
                             />
-                            <strong>DEMO Mode</strong> - Simulate trades without real broker API
-                        </label>
-                        <p style={{ fontSize: '0.9em', color: '#666', marginTop: '0.5rem' }}>
-                            When enabled, the bot will create simulated positions when TradingView alerts arrive, without executing real trades.
-                        </p>
+                            <p style={{ fontSize: '0.85em', color: '#666', marginTop: '0.25rem' }}>
+                                Close position if loss reaches this percentage
+                            </p>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Take Profit (%)</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                value={config.take_profit_percent}
+                                onChange={(e) => setConfig({ ...config, take_profit_percent: parseFloat(e.target.value) })}
+                                placeholder="e.g., 5 for 5% profit"
+                            />
+                            <p style={{ fontSize: '0.85em', color: '#666', marginTop: '0.25rem' }}>
+                                Close position if profit reaches this percentage
+                            </p>
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label>Risk Level</label>
-                        <select
-                            value={config.risk_level}
-                            onChange={(e) => setConfig({ ...config, risk_level: e.target.value })}
-                        >
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
+
+                    {/* Position Sizing Section */}
+                    <div style={{ 
+                        padding: '1rem', 
+                        backgroundColor: '#d4edda', 
+                        borderRadius: '8px', 
+                        marginBottom: '1.5rem',
+                        border: '1px solid #28a745'
+                    }}>
+                        <h3 style={{ marginTop: 0, fontSize: '1.1rem', color: '#155724' }}>💰 Position Sizing</h3>
+                        
+                        <div className="form-group">
+                            <label>Risk Level</label>
+                            <select
+                                value={config.risk_level}
+                                onChange={(e) => setConfig({ ...config, risk_level: e.target.value })}
+                                style={{ padding: '0.5rem', width: '100%' }}
+                            >
+                                <option value="low">Low - Conservative</option>
+                                <option value="medium">Medium - Balanced</option>
+                                <option value="high">High - Aggressive</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Max Position Size ($)</label>
+                            <input
+                                type="number"
+                                value={config.max_position_size}
+                                onChange={(e) => setConfig({ ...config, max_position_size: parseFloat(e.target.value) })}
+                                placeholder="e.g., 1000"
+                            />
+                            <p style={{ fontSize: '0.85em', color: '#155724', marginTop: '0.25rem' }}>
+                                Maximum dollar amount per trade
+                            </p>
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label>Max Position Size ($)</label>
-                        <input
-                            type="number"
-                            value={config.max_position_size}
-                            onChange={(e) => setConfig({ ...config, max_position_size: parseFloat(e.target.value) })}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Stop Loss (%)</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            value={config.stop_loss_percent}
-                            onChange={(e) => setConfig({ ...config, stop_loss_percent: parseFloat(e.target.value) })}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Take Profit (%)</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            value={config.take_profit_percent}
-                            onChange={(e) => setConfig({ ...config, take_profit_percent: parseFloat(e.target.value) })}
-                        />
-                    </div>
-                    <button type="submit" className="btn">Save Configuration</button>
+
+                    <button type="submit" className="btn" style={{ 
+                        width: '100%', 
+                        padding: '0.75rem',
+                        fontSize: '1rem',
+                        fontWeight: 'bold'
+                    }}>
+                        💾 Save Configuration
+                    </button>
                 </form>
             </div>
 

@@ -11,7 +11,7 @@ def get_config(user_id):
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent, demo_mode
+        SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent, demo_mode, auto_close_enabled
         FROM bot_config WHERE user_id = ?
     ''', (user_id,))
     
@@ -19,11 +19,11 @@ def get_config(user_id):
     
     if not config:
         # Create bot config if missing
-        cursor.execute('INSERT INTO bot_config (user_id, is_active, demo_mode) VALUES (?, ?, ?)',
-                       (user_id, 0, 1))
+        cursor.execute('INSERT INTO bot_config (user_id, is_active, demo_mode, auto_close_enabled) VALUES (?, ?, ?, ?)',
+                       (user_id, 0, 1, 1))
         conn.commit()
         cursor.execute('''
-            SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent, demo_mode
+            SELECT risk_level, max_position_size, stop_loss_percent, take_profit_percent, demo_mode, auto_close_enabled
             FROM bot_config WHERE user_id = ?
         ''', (user_id,))
         config = cursor.fetchone()
@@ -36,12 +36,19 @@ def get_config(user_id):
     except (KeyError, TypeError):
         demo_mode = True
     
+    # Handle auto_close_enabled field safely
+    try:
+        auto_close_enabled = bool(config['auto_close_enabled'])
+    except (KeyError, TypeError):
+        auto_close_enabled = True
+    
     return jsonify({
         'risk_level': config['risk_level'],
         'max_position_size': config['max_position_size'],
         'stop_loss_percent': config['stop_loss_percent'],
         'take_profit_percent': config['take_profit_percent'],
-        'demo_mode': demo_mode
+        'demo_mode': demo_mode,
+        'auto_close_enabled': auto_close_enabled
     }), 200
 
 @settings_bp.route('/config', methods=['PUT'])
@@ -72,6 +79,10 @@ def update_config(user_id):
     if 'demo_mode' in data:
         cursor.execute('UPDATE bot_config SET demo_mode = ? WHERE user_id = ?',
                        (data['demo_mode'], user_id))
+    
+    if 'auto_close_enabled' in data:
+        cursor.execute('UPDATE bot_config SET auto_close_enabled = ? WHERE user_id = ?',
+                       (data['auto_close_enabled'], user_id))
     
     conn.commit()
     conn.close()

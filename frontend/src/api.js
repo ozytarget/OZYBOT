@@ -67,6 +67,21 @@ export const api = {
         return response.json();
     },
 
+    closePosition: async (token, positionId) => {
+        const response = await fetch(`${API_BASE_URL}/dashboard/close-position/${positionId}`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to close position');
+        }
+        return response.json();
+    },
+
     // Settings endpoints
     getConfig: async (token) => {
         const response = await fetch(`${API_BASE_URL}/settings/config`, {

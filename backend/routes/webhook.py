@@ -129,7 +129,7 @@ def process_demo_trade(webhook_data):
     
     # Get all active users with demo mode enabled
     cursor.execute('''
-        SELECT user_id, max_position_size, stop_loss_percent, take_profit_percent
+        SELECT user_id, max_position_size, stop_loss_percent, take_profit_percent, auto_close_enabled
         FROM bot_config 
         WHERE is_active = 1 AND demo_mode = 1
     ''')
@@ -187,16 +187,18 @@ def process_demo_trade(webhook_data):
                 WHERE id = ?
             ''', (price, pnl, pos['id']))
             
-            # Check if Stop Loss or Take Profit is triggered
+            # Check if Stop Loss or Take Profit is triggered (only if auto-close is enabled)
             should_close = False
             close_reason = ""
+            auto_close_enabled = bot['auto_close_enabled']
             
-            if pnl_percent <= -stop_loss_pct:
-                should_close = True
-                close_reason = f"Stop Loss ({pnl_percent:.2f}%)"
-            elif pnl_percent >= take_profit_pct:
-                should_close = True
-                close_reason = f"Take Profit ({pnl_percent:.2f}%)"
+            if auto_close_enabled:
+                if pnl_percent <= -stop_loss_pct:
+                    should_close = True
+                    close_reason = f"Stop Loss ({pnl_percent:.2f}%)"
+                elif pnl_percent >= take_profit_pct:
+                    should_close = True
+                    close_reason = f"Take Profit ({pnl_percent:.2f}%)"
             
             if should_close:
                 # Close the position
